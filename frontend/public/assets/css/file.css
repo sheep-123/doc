@@ -292,3 +292,41 @@
 .upload-card :deep(.el-upload-dragger) {
   padding: 0!important;
 }
+
+.edit-icon {
+  margin-left: 10px;
+  cursor: pointer;
+}
+
+.tag-container {
+  margin: 12px 0;
+  flex-wrap: wrap;
+  row-gap: 8px;
+}
+
+.multi-tag {
+  margin-right: 8px;
+  margin-bottom: 8px;
+  padding: 8px 15px;
+  border-radius: 15px;
+  transition: all 0.2s ease;
+  position: relative;
+  cursor: pointer;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.selected-icon {
+  margin-left: 5px;
+  font-size: 12px;
+  vertical-align: middle;
+}
+
+/* 选中状态样式 */
+.el-check-tag.is-checked {
+  background-color: var(--el-color-success-light-9);
+  border-color: var(--el-color-success);
+}
