@@ -157,7 +157,9 @@
             :src="doc.docURL"
             class="doc-preview"
           />
-          <div class="ms" v-if="doc.parse">提取知识中...</div>
+          <div class="ms" v-if="doc.parse">
+            解析进度：{{ doc.parseProgress }}%
+          </div>
         </div>
 
         <!-- 倒立梯形标签 -->
@@ -247,15 +249,15 @@ import { ElMessage } from 'element-plus';
 // import Header from '@/components/header.vue';
 
 const { proxy } = getCurrentInstance();
-// const ws = ref(null)
+const ws = ref(null);
+const parseQueue = ref([]);
+const isParsing = ref(false);
+
 onMounted(() => {
   getFileList();
   getTagList();
   getQuerySearch();
-  // getDomain()
-  // if (ws.value) {
-  //   ws.value.close();
-  // }
+  connectWebsocket();
 });
 
 const documents = ref([]);
@@ -285,6 +287,7 @@ const getFileList = async () => {
       status: item.status == 2 || item.status == 1 ? '未记忆' : '已记忆',
       tags: item.tag,
       parse: false,
+      parseProgress: 0,
       finish: true,
       id: item.id,
       isMemory: item.status == 3 ? true : false,
@@ -322,16 +325,14 @@ const getQuerySearch = async () => {
   }
 };
 
-// 获取后端域名
-const getDomain = async () => {
-  // 获取后端域名
-  var result = await proxy.$POST({
-    url: 'file/getdomain'
-  });
-
-  if (result.code == 1) {
-    ws.value = new WebSocket(result.data);
+// websocket
+const connectWebsocket = async () => {
+  if (ws.value) {
+    ws.value.close();
   }
+
+  ws.value = new WebSocket('ws://192.168.6.137:8000/ws');
+  setupWebSocketHandler(); // 初始化消息处理器
 
   ws.value.onopen = () => {
     console.log('WebSocket连接已建立');
@@ -339,7 +340,6 @@ const getDomain = async () => {
 
   ws.value.onerror = (error) => {
     console.error('WebSocket错误:', error);
-    // ElMessage.error('实时连接异常');
   };
 };
 
@@ -390,6 +390,7 @@ const filterDocuments = async () => {
       status: item.status == 2 || item.status == 1 ? '未记忆' : '已记忆',
       tags: item.tag,
       parse: false,
+      parseProgress: 0,
       finish: true,
       id: item.id,
       isMemory: item.status == 3 ? true : false,
@@ -430,6 +431,7 @@ const beforeUpload = (file) => {
     status: '上传中',
     tags: '',
     parse: false,
+    parseProgress: 0,
     finish: false,
     id: Date.now(), // 临时ID
     isMemory: false,
@@ -455,12 +457,50 @@ const handleProgress = (event, file, fileList) => {
   }
 };
 
-// 上传成功处理
-const handleSuccess = async (response, file) => {
-  // console.log(file)
+// 统一的消息处理器
+const setupWebSocketHandler = () => {
+  if (!ws.value) return;
+
+  ws.value.onmessage = (event) => {
+    const data = JSON.parse(event.data);
+    const targetDoc = documents.value.find(d => d.id === data.id);
+    
+    if (targetDoc) {
+      targetDoc.parseProgress = Math.floor(data.progress);
+      if (data.progress === 100) {
+        targetDoc.parse = false;
+        targetDoc.finish = true;
+        parseQueue.value.shift();
+        startNextParse();
+      }
+    }
+  };
+};
+
+// 启动解析流程
+const startNextParse = () => {
+  if (parseQueue.value.length === 0 || isParsing.value) return;
+
+  isParsing.value = true;
+  const currentDoc = parseQueue.value[0];
+  
+  const targetDoc = documents.value.find(d => d.id === currentDoc.id);
+  if (targetDoc && !targetDoc.finish) {
+    targetDoc.parse = true;
+    sendViaWebSocket({
+      type: 'parse',
+      filename: currentDoc.file.name,
+      id: currentDoc.id,
+      data: currentDoc.base64Data
+    });
+  }
+};
+
+// 在handleSuccess方法中调用队列添加
+const handleSuccess = async (response, uploadFile) => {
   loading.value = false;
   const targetIndex = documents.value.findIndex(
-    (d) => d.title === file.name && d.isUploaded
+    (d) => d.title === uploadFile.name && d.isUploaded
   );
 
   if (targetIndex !== -1) {
@@ -476,44 +516,43 @@ const handleSuccess = async (response, file) => {
     documents.value.splice(targetIndex, 1, updatedDoc);
   }
 
-  // await sleep(1500);
-  for (let j = 0; j < documents.value.length; j++) {
-    if (documents.value[j].finish) {
-      continue;
-    } else {
-      if (!documents.value[j].isUploaded) {
-        documents.value[j].parse = true;
-      }
+  // 获取上传文件对象
+  const file = uploadFile.raw;
 
-      // // 发送消息
-      // ws.value.send(JSON.stringify({
-      //   type: 'start_parse',
-      //   data: {
-      //     file_id: documents.value[j].id
-      //   }
-      // }));
+  // 转换为Base64后加入队列
+  const base64Data = await fileToBase64(file);
+  addToParseQueue({
+    id: response.data.id,
+    file: uploadFile.raw,
+    base64Data
+  });
+};
 
-      // // 处理WebSocket消息
-      // ws.value.onmessage = (event) => {
-      //   const data = JSON.parse(event.data);
-      //   console.log(data)
-      //   switch (data.type) {
-      //     case 'parse_response':
+// 添加文件到解析队列
+const addToParseQueue = (fileData) => {
+  parseQueue.value.push(fileData);
+  if (!isParsing.value) {
+    startNextParse();
+  }
+};
 
-      //        console.log("file_id:"+data.data.file_id)
-      //       break;
-      //     // 处理其他消息类型
-      //   }
-      // };
+// 文件转Base64工具函数
+const fileToBase64 = (file) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result.split(',')[1]); // 去除data:前缀
+    reader.onerror = (error) => reject(error);
+    reader.readAsDataURL(file);
+  });
+};
 
-      // ws.value.onclose = () => {
-      //   console.log('WebSocket连接已关闭');
-      // };
-
-      await sleep(5000);
-      documents.value[j].parse = false;
-      documents.value[j].finish = true;
-    }
+// WebSocket发送方法
+const sendViaWebSocket = (data) => {
+  if (ws.value?.readyState === WebSocket.OPEN) {
+    ws.value.send(JSON.stringify(data));
+  } else {
+    console.error('WebSocket连接未就绪');
+    // 可以在这里添加重连逻辑
   }
 };
 
@@ -616,7 +655,7 @@ const pageChange = async (num) => {
     params: { page: page.value, num: num.value }
   });
 
- documents.value = [];
+  documents.value = [];
   result.data.data.map((item) => {
     documents.value.push({
       title: item.file_name,
@@ -628,13 +667,13 @@ const pageChange = async (num) => {
       status: item.status == 2 || item.status == 1 ? '未记忆' : '已记忆',
       tags: item.tag,
       parse: false,
+      parseProgress: 0,
       finish: true,
       id: item.id,
       isMemory: item.status == 3 ? true : false,
       isEditing: false // 新增状态控制编辑模式
     });
   });
-
 };
 
 // 搜索
@@ -660,6 +699,7 @@ const searchDocuments = async () => {
       status: item.status == 2 || item.status == 1 ? '未记忆' : '已记忆',
       tags: item.tag,
       parse: false,
+      parseProgress: 0,
       finish: true,
       id: item.id,
       isMemory: item.status == 3 ? true : false,
@@ -669,7 +709,7 @@ const searchDocuments = async () => {
 
   maxPage.value = Math.ceil(result.data.count / num.value);
   totalFiles.value = result.data.count;
-}
+};
 
 const restaurants = ref([]);
 const querySearch = (queryString, cb) => {
@@ -710,6 +750,7 @@ const resetAll = async () => {
       status: item.status == 2 || item.status == 1 ? '未记忆' : '已记忆',
       tags: item.tag,
       parse: false,
+      parseProgress: 0,
       finish: true,
       id: item.id,
       isMemory: item.status == 3 ? true : false,

@@ -1,6 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import file from '../views/file.vue'
-import chat from '../views/chat.vue'
 
 const routes = [
   {
@@ -8,11 +7,6 @@ const routes = [
     name: 'file',
     component: file
   },
-  {
-   path: '/chat',
-   name: 'chat',
-   component: chat
-  }
 ]
 
 const router = createRouter({
