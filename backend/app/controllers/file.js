@@ -45,7 +45,7 @@ exports.getFileList = async (req, res) => {
     // 获取请求参数
     const {
       page = 1,
-      num = 24,
+      num = 23,
       tag = '',
       keywords = '',
       status = 0
@@ -62,7 +62,8 @@ exports.getFileList = async (req, res) => {
       where,
       order: [['id', 'DESC']],
       offset: (page - 1) * num,
-      limit: Number(num)
+      limit: Number(num),
+      // limit: 1
     });
 
     // 响应格式处理
@@ -252,6 +253,7 @@ exports.updateMemoryStatus = async (req, res) => {
   try {
     // 获取并验证ID参数
     const id = parseInt(req.body.id) || 0;
+
     if (!id || id <= 0) {
       return res.status(400).json({
         code: 0,
@@ -361,5 +363,46 @@ exports.updateFileTag = async (req, res) => {
       msg: `服务器错误: ${err.message}`,
       data: null
     });
+  }
+};
+
+exports.deleteFile = async (req, res) => {
+  try {
+    // const id = parseInt(req.body.id);
+    const {id}=req.query
+    // return
+    if (!id || id <= 0) {
+      return res.status(400).json({
+        code: 0,
+        msg: '无效的文件ID',
+        data: null
+      });
+    }
+    const file = await File.findByPk(id);
+    if (!file) {
+      return res.status(404).json({
+        code: 0,
+        msg: '文件不存在',
+        data: null
+      });
+    }
+    const status=await file.destroy();
+    if (status) {
+      res.status(200).json({
+        code: 1,
+        msg: '文件删除成功',
+        data: null
+      });
+    } else {
+      res.status(500).json({
+        code: 0,
+        msg: '文件删除失败',
+        data: null
+      });
+    }
+
+
+  }catch (err) {
+    console.error('文件删除失败:', err);
   }
 };

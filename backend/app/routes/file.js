@@ -15,5 +15,7 @@ module.exports = (app) => {
 
   router.post('/edittag', file.updateFileTag);
 
+  router.get('/deletefile', file.deleteFile);
+
   app.use('/file', router);
 };

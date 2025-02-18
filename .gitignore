@@ -24,3 +24,6 @@ dist-ssr
 *.sw?
 
 /backend/node_modules/
+/frontend/node_modules/
+/frontend/dist/
+/backend/app/uploads/*

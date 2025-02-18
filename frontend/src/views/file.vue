@@ -1,36 +1,51 @@
 <template>
-  <el-row :gutter="20" style="height: 60px; display: flex; align-items: center">
-    <!-- 自动补全搜索框 -->
-    <el-autocomplete v-model="searchQuery" :fetch-suggestions="querySearch" clearable class="inline-input w-50"
-      placeholder="请输入文档名字" @select="handleSelect" :trigger-on-focus="false" style="width: 400px;margin-left: 20px;" />
+  <!-- 导航栏 -->
+  <div class="nav">
+    <div class="nav-left">
+      <el-icon :size="25">
+        <Expand />
+      </el-icon>
+      <p class="title">智慧助手</p>
+    </div>
 
-    <el-button type="primary" icon="Search" @click="searchDocuments" style="margin-left: 20px;">搜索</el-button>
-    <el-button type="info" icon="Refresh" @click="resetAll" plain style="color: black">重置</el-button>
-    <!-- <el-button type="success" @click="memorized" plain>已记忆</el-button> -->
-    <!-- <el-button type="danger" @click="noMemory" plain>未记忆</el-button> -->
-    <!-- 标签栏 -->
+    <div class="nav-right">
+      <div class="left">
+        <el-autocomplete v-model="searchQuery" :fetch-suggestions="querySearch" clearable class="inline-input w-50"
+          placeholder="请输入文档名字" @select="handleSelect" :trigger-on-focus="false" style="width: 300px;" />
 
-    <!-- 统计信息 -->
-    <span style="margin-left: 10px">总文件数：{{ totalFiles }}</span>
-    <span style="margin-left: 20px">总页数：{{ maxPage }}</span>
-  </el-row>
-  <el-row :gutter="20" style="height: 40px;margin: 10px 10px;">
-    <el-check-tag v-for="tag in tags" :key="tag" :checked="selectedTagsMap[tag]" class="multi-tag"
-      :type="selectedTagsMap[tag] ? 'success' : 'info'" @change="handleTagChange(tag)">
-      {{ tag }}
-      <!-- <el-icon v-if="selectedTagsMap[tag]" class="selected-icon">
-        <Check />
-      </el-icon> -->
-    </el-check-tag>
-  </el-row>
+        <el-button type="primary" icon="Search" @click="searchDocuments" style="margin-left: 10px;">搜索</el-button>
+        <el-button type="info" icon="Refresh" @click="resetAll" plain style="color: black">重置</el-button>
+      </div>
+      <div class="avatar">
+        <el-avatar :size="25" :src="circleUrl" />
+      </div>
+    </div>
+  </div>
 
-  <el-row :gutter="20">
+  <!-- 一级标签 -->
+  <a-menu v-model:selectedKeys="current" mode="horizontal" :items="firstTagItems" />
+
+  <!-- 二级标签 -->
+  <div class="second-tag" v-show="current == 'law'">
+    <el-row :gutter="20" style="margin: 10px;">
+      <el-check-tag v-for="tag in tags" :key="tag" :checked="selectedTagsMap[tag]" class="multi-tag"
+        :type="selectedTagsMap[tag] ? 'success' : 'info'" @change="handleTagChange(tag)">
+        {{ tag }}
+        <el-icon v-if="selectedTagsMap[tag]">
+          <Select />
+        </el-icon>
+      </el-check-tag>
+    </el-row>
+  </div>
+
+
+  <el-row :gutter="20" v-show="current == 'law'">
     <!-- Add New 按钮 -->
     <el-col :span="100">
       <el-upload action="/file/upload" :before-upload="beforeUpload" :on-success="handleSuccess"
         :on-progress="handleProgress" :on-error="handleError" accept=".pdf" :show-file-list="false" :multiple="true"
         :disabled="isMemoryProcessing" drag class="upload-card">
-        <el-card class="add-el-card" :style="{ width: '280px', height: '256px' }"
+        <el-card class="add-el-card" :style="{ width: '255px', height: '256px' }"
           :class="{ uploading: loading, disabled: isMemoryProcessing }">
           <el-icon>
             <Plus />
@@ -53,11 +68,11 @@
 
     <!-- 文档卡片 -->
     <el-col :span="100" v-for="(doc, index) in documents" :key="index">
-      <el-card :style="{ width: '280px', height: '256px' }">
+      <el-card :style="{ width: '255px', height: '256px' }">
         <!-- 添加编辑图标和输入框 -->
         <div class="tab-edit">
           <template v-if="!doc.tags && !doc.isEditing">
-            <el-button type="info" plain icon="Edit" @click="editTag(doc)" style="color: black">标签</el-button>
+            <el-button type="info" plain icon="Edit" @click="editTag(doc)" style="color: black">未定义标签</el-button>
           </template>
           <template v-else-if="!doc.isEditing">
             <el-button type="info" plain icon="Edit" @click="editTag(doc)" style="color: black">{{ doc.tags
@@ -72,15 +87,17 @@
             </div>
           </template>
         </div>
-
+        <!-- 标题 -->
         <div slot="header" class="title">
           <el-tooltip :content="doc.title" placement="top">
-            <span>{{ truncateFileName(doc.title, 13) }}</span>
+            <span>{{ truncateFileName(doc.title, 11) }}</span>
           </el-tooltip>
         </div>
+        <!-- 解析 -->
         <div class="content">
           <img v-if="doc.type === 'image'" :src="doc.docURL" alt="Document Preview" class="doc-preview" />
           <embed v-else-if="doc.type === 'pdf'" :src="doc.docURL" class="doc-preview" />
+          <!-- <canvas id="pdf" :ref="el => initCanvas(el, doc)" style="width: 100%; height: 180px;"></canvas> -->
           <div class="ms" v-if="doc.parse">
             解析进度：{{ doc.parseProgress }}%
           </div>
@@ -118,7 +135,7 @@
             </el-progress>
           </div>
         </div>
-
+        <!-- 深度记忆中 -->
         <div v-if="doc.isProcessing" class="glass-overlay">
           <div class="progress-info">
             <div class="progress-text">深度记忆中{{ doc.progress }}%</div>
@@ -142,20 +159,25 @@
       </el-card>
     </el-col>
   </el-row>
+
+  <!-- pdf预览 -->
   <el-dialog v-model="showPdf" title="Pdf预览" width="800">
     <embed :src="pdfUrl" type="application/pdf" width="100%" height="600px" />
   </el-dialog>
+
   <!-- 分页 -->
-  <div class="page">
+  <div class="page" v-show="current == 'law'">
     <el-pagination layout="prev, pager, next" :total="1000" :page-size="num" @current-change="pageChange"
       :page-count="maxPage" />
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, getCurrentInstance, nextTick, reactive, onUnmounted } from 'vue';
+import { ref, onMounted, getCurrentInstance, reactive, onUnmounted, computed } from 'vue';
 import { ElMessage } from 'element-plus';
-// import Header from '@/components/header.vue';
+// import * as pdfjsLib from 'pdfjs-dist'
+// pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.min.mjs';
+// pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/+esm';
 
 const { proxy } = getCurrentInstance();
 const ws = ref(null);
@@ -169,16 +191,60 @@ onMounted(() => {
   connectWebsocket();
 });
 
-const documents = ref([]);
-const isMemoryProcessing = ref(false); // 添加全局状态控制蒙层
-
 // 分页
 const page = ref(1);
-const num = ref(24);
+const num = ref(23);
 const maxPage = ref(0);
 const totalFiles = ref(0);
 
-// 在 setup 顶部添加公共方法
+const circleUrl = ref('https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png');
+const current = ref(['law']);
+
+const firstTagItems = computed(() => [
+  {
+    key: 'law',
+    label: `法律法规(${totalFiles.value})`,
+    title: '法律法规',
+  },
+  {
+    key: 'policy',
+    label: '政策解读',
+    title: '政策解读',
+  },
+  {
+    key: 'official document',
+    label: '公文',
+    title: '公文',
+  },
+  {
+    key: 'research report',
+    label: '调研报告',
+    title: '调研报告',
+  },
+  {
+    key: 'instructions',
+    label: '指导书',
+    title: '指导书',
+  },
+  {
+    key: 'user and operation manual',
+    label: '用户及操作手册',
+    title: '用户及操作手册',
+  },
+  {
+    key: 'operation and maintenance knowledge base',
+    label: '运维知识库',
+    title: '运维知识库',
+  },
+  {
+    key: 'database script',
+    label: '数据库脚本',
+    title: '数据库脚本',
+  },
+])
+const documents = ref([]);
+const isMemoryProcessing = ref(false); // 添加全局状态控制蒙层
+
 const mapDocumentData = (item) => ({
   title: item.file_name,
   type: 'pdf',
@@ -234,6 +300,7 @@ const getQuerySearch = async () => {
   }
 };
 
+
 const MAX_RETRIES = 3;
 let retryCount = 0;
 
@@ -255,7 +322,7 @@ const connectWebsocket = async () => {
     };
 
     ws.value.onopen = () => {
-      // console.log('WebSocket连接已建立');
+      console.log('WebSocket连接已建立');
     };
 
     ws.value.onerror = (error) => {
@@ -288,13 +355,13 @@ const updateSelectedTags = () => {
   );
 };
 
-// 文档筛选方法示例
+// 文档筛选方法
 const filterDocuments = async () => {
   const result = await proxy.$GET({
     url: 'file/getfilelist',
     params: {
       tag: selectedTags.value.join(','),
-      page: page.value,
+      page: 1,
       num: num.value,
       keywords: searchQuery.value ?? ''
     }
@@ -364,18 +431,47 @@ const handleProgress = (event, file, fileList) => {
 const setupWebSocketHandler = () => {
   if (!ws.value) return;
 
-  ws.value.onmessage = (event) => {
+  ws.value.onmessage = async (event) => {
     const data = JSON.parse(event.data);
-    const targetDoc = documents.value.find(d => d.id === data.id);
+    if (data.status === 'error') {
+      ElMessage.error(data.message);
 
-    if (targetDoc) {
-      targetDoc.parseProgress = Math.floor(data.progress);
-      if (data.progress === 100) {
-        targetDoc.parse = false;
-        targetDoc.finish = true;
-        parseQueue.value.shift();
+      // 立即从解析队列中移除失败项
+      parseQueue.value = parseQueue.value.filter(item => item.id != data.id);
+      console.log(parseQueue.value)
+
+      try {
+        const result = await proxy.$GET({
+          url: 'file/deletefile',
+          params: { id: data.id }
+        });
+
+        if (result.code === 1) {
+          // 从界面移除文档
+          documents.value = documents.value.filter(d => d.id != data.id);
+
+          // 强制继续解析
+          isParsing.value = false;
+          startNextParse();
+        }
+      } catch (error) {
+        console.error('删除文件失败:', error);
+        // 即使删除失败也继续解析
         isParsing.value = false;
         startNextParse();
+      }
+    } else {
+      const targetDoc = documents.value.find(d => d.id === data.id);
+
+      if (targetDoc) {
+        targetDoc.parseProgress = Math.floor(data.progress);
+        if (data.progress === 100) {
+          targetDoc.parse = false;
+          targetDoc.finish = true;
+          parseQueue.value.shift();
+          isParsing.value = false;
+          startNextParse();
+        }
       }
     }
   };
@@ -462,7 +558,6 @@ const sendViaWebSocket = (data) => {
   }
 };
 
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 // 上传错误处理
 const handleError = (err) => {
@@ -604,6 +699,7 @@ const resetAll = async () => {
   documents.value = result.data.data.map(mapDocumentData);
 
   maxPage.value = Math.ceil(result.data.count / num.value);
+  totalFiles.value= result.data.count;
 };
 
 const handleSelect = (item) => {
@@ -693,6 +789,58 @@ onUnmounted(() => {
   }
   parseQueue.value = [];
 });
+
+// 修改canvas初始化方法
+const initCanvas = async (el, doc) => {
+  if (!el || !doc?.docURL) {
+    console.error('Canvas元素或文档URL缺失');
+    return;
+  }
+
+  const canvas = el;
+  const ctx = canvas.getContext('2d');
+  // console.log(ctx);
+  const pdfurl = doc.docURL;
+
+  try {
+    const loadingTask = pdfjsLib.getDocument(pdfurl);
+    loadingTask.promise.then(function (pdf) {
+      console.log(pdf)
+      var pageNumber = 1;
+      pdf.getPage(pageNumber).then(function (page) {
+        console.log('Page loaded');
+
+        var scale = 1.5;
+        var viewport = page.getViewport({ scale: scale });
+
+        // Prepare canvas using PDF page dimensions
+        var canvas = document.getElementById('pdf');
+        console.log(canvas);
+        var context = canvas.getContext('2d');
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
+
+        // Render PDF page into canvas context
+        var renderContext = {
+          canvasContext: context,
+          viewport: viewport
+        };
+        var renderTask = page.render(renderContext);
+        renderTask.promise.then(function () {
+          console.log('Page rendered');
+        });
+      });
+      // 在这里可以使用 pdf 对象进行进一步操作
+    });
+
+
+  } catch (error) {
+    console.error(`[${doc.title}] 渲染失败:`, error);
+
+  }
+};
+
+
 </script>
 
 <style scoped>

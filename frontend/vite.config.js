@@ -10,6 +10,7 @@ export default defineConfig({
     alias: {
       "@": path.resolve(__dirname, "src"),
       vue: "vue/dist/vue.esm-bundler.js",
+      '@public': path.resolve(__dirname, "public")
     },
   },
   server: {
@@ -21,5 +22,7 @@ export default defineConfig({
         rewrite: (path) => path.replace(/^\/file/, ""), 
       },
     },
+    host:true,
   },
+
 });
