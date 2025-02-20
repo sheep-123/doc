@@ -207,10 +207,10 @@
   right: 0;
   bottom: 0;
   background: rgba(0, 0, 0, 0.5);
-  width: 230px;
-  height: 160px;
+  width: 215px;
+  height: 155px;
   margin-left: 35px;
-  margin-top: 80px;
+  margin-top: 75px;
 
   border-radius: 20px;
   transition: all 0.3s linear;

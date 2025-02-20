@@ -57,7 +57,7 @@
           <el-upload action="/file/upload" :before-upload="beforeUpload" :on-success="handleSuccess"
             :on-progress="handleProgress" :on-error="handleError" accept=".pdf" :show-file-list="false" :multiple="true"
             :disabled="isMemoryProcessing" drag class="upload-card">
-            <el-card class="add-el-card" :style="{ width: '255px', height: '256px' }"
+            <el-card class="add-el-card" :style="{ width: '245px', height: '245px' }"
               :class="{ uploading: loading, disabled: isMemoryProcessing }">
               <el-icon>
                 <Plus />
@@ -80,7 +80,7 @@
 
         <!-- 文档卡片 -->
         <el-col :span="100" v-for="(doc, index) in documents" :key="index">
-          <el-card :style="{ width: '255px', height: '256px' }">
+          <el-card :style="{ width: '245px', height: '245px' }">
             <!-- 添加编辑图标和输入框 -->
             <div class="tab-edit">
               <template v-if="!doc.tags && !doc.isEditing">
