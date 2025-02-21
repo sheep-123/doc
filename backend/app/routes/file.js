@@ -17,5 +17,7 @@ module.exports = (app) => {
 
   router.get('/deletefile', file.deleteFile);
 
+  router.get('/getpolicy', file.getPolicy);
+
   app.use('/file', router);
 };

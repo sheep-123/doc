@@ -26,6 +26,10 @@ module.exports = (sequelize, Sequelize) => {
     tag:{
       type: Sequelize.STRING,
       comment: '标签'
+    },
+    type:{
+      type: Sequelize.STRING,
+      comment: '类型'
     }
   },{
     timestamps:true,

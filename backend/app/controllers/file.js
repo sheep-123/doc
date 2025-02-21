@@ -39,16 +39,14 @@ const upload = multer({
 
 exports.getFileList = async (req, res) => {
   try {
-
-    console.log('原始查询参数:', req.query);
-
     // 获取请求参数
     const {
       page = 1,
       num = 23,
       tag = '',
       keywords = '',
-      status = 0
+      status = 0,
+      type=''
     } = req.query;
 
     // 构建查询条件
@@ -56,13 +54,14 @@ exports.getFileList = async (req, res) => {
     if (tag) where.tag = tag;
     if (keywords) where.file_name = { [Op.like]: `%${keywords}%` };
     if (status) where.status = status;
+    if(type) where.type = type;
 
     // 分页查询
     const result = await File.findAndCountAll({
       where,
       order: [['id', 'DESC']],
       offset: (page - 1) * num,
-      limit: Number(num),
+      limit: Number(num)
       // limit: 1
     });
 
@@ -106,6 +105,17 @@ exports.upload = [
         });
       }
 
+      const { type } = req.body; // 获取前端传递的type参数
+      if (!type) {
+        // 如果type是必填项，删除已上传文件
+        fs.unlinkSync(req.file.path);
+        return res.status(400).json({
+          code: 0,
+          msg: '缺少type参数',
+          data: null
+        });
+      }
+
       // 新增文件名解码处理
       const decodedName = Buffer.from(req.file.originalname, 'latin1').toString(
         'utf8'
@@ -121,7 +131,8 @@ exports.upload = [
       const fileInfo = {
         file_name: cleanFileName,
         file_path: `${domain}${filePath}`, // 直接存储完整URL
-        status: 1
+        status: 1,
+        type: type
       };
 
       // 保存到数据库
@@ -369,7 +380,7 @@ exports.updateFileTag = async (req, res) => {
 exports.deleteFile = async (req, res) => {
   try {
     // const id = parseInt(req.body.id);
-    const {id}=req.query
+    const { id } = req.query;
     // return
     if (!id || id <= 0) {
       return res.status(400).json({
@@ -386,7 +397,7 @@ exports.deleteFile = async (req, res) => {
         data: null
       });
     }
-    const status=await file.destroy();
+    const status = await file.destroy();
     if (status) {
       res.status(200).json({
         code: 1,
@@ -400,9 +411,60 @@ exports.deleteFile = async (req, res) => {
         data: null
       });
     }
-
-
-  }catch (err) {
+  } catch (err) {
     console.error('文件删除失败:', err);
+  }
+};
+
+exports.getPolicy = async (req, res) => {
+  try {
+    // 获取请求参数
+    const {
+      page = 1,
+      num = 23,
+      keywords = '',
+      status = 0,
+      type=''
+    } = req.query;
+
+    // 构建查询条件
+    const where = {};
+    if (keywords) where.file_name = { [Op.like]: `%${keywords}%` };
+    if (status) where.status = status;
+    if(type) where.type = type;
+
+    // 分页查询
+    const result = await File.findAndCountAll({
+      where,
+      order: [['id', 'DESC']],
+      offset: (page - 1) * num,
+      limit: Number(num)
+    });
+
+    // 响应格式处理
+    const responseData = {
+      count: result.count,
+      data: result.rows
+    };
+
+    if (result.rows.length > 0) {
+      res.status(200).json({
+        code: 1,
+        msg: '获取文件成功',
+        data: responseData
+      });
+    } else {
+      res.status(200).json({
+        code: 0,
+        msg: '暂无文件',
+        data: null
+      });
+    }
+  } catch (err) {
+    res.status(500).json({
+      code: 500,
+      msg: `服务器错误: ${err.message}`,
+      data: null
+    });
   }
 };
