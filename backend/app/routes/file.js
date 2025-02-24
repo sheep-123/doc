@@ -19,5 +19,17 @@ module.exports = (app) => {
 
   router.get('/getpolicy', file.getPolicy);
 
+  router.get('/getofficial', file.getOfficial);
+
+  router.get('/getbook', file.getBook);
+
+  router.get('/gethandlebook', file.getHandleBook);
+
+  router.get('/getreport', file.getReport);
+
+  router.get('/getrepository', file.getRepository);
+
+  router.get('/getscript', file.getScript);
+
   app.use('/file', router);
 };

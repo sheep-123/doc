@@ -5,9 +5,15 @@ const fs = require('fs');
 const path = require('path');
 
 const app = express();
-// 允许前端访问8080端口
+// 允许前端访问端口
+// var corsOptions = {
+//   origin: 'http://localhost:7777'
+// };
+
 var corsOptions = {
-  origin: 'http://localhost:8080'
+  origin: true,  // 改为true允许所有来源
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],  // 添加允许的HTTP方法
+  allowedHeaders: ['Content-Type', 'Authorization']  // 添加允许的请求头
 };
 
 app.use(cors(corsOptions));
@@ -55,8 +61,8 @@ if (!fs.existsSync(uploadDir)) {
 app.use('/uploads', express.static(uploadDir));
 
 // set port, listen for requests
-// 环境变量优先，默认8080
-const PORT = process.env.PORT || 8080;
+// 环境变量优先，默认
+const PORT = process.env.PORT || 7777;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}.`);
 });

@@ -19,20 +19,29 @@
         <el-button type="primary" icon="Search" @click="searchDocuments" style="margin-left: 10px;">搜索</el-button>
         <el-button type="info" icon="Refresh" @click="resetAll" plain style="color: black">重置</el-button>
       </div>
-      <div class="avatar">
-        <el-avatar :size="25" :src="circleUrl" />
-      </div>
+
+      <el-dropdown>
+        <div class="avatar">
+          <el-avatar :size="25" :src="circleUrl" />
+        </div>
+        <template #dropdown>
+          <el-dropdown-menu>
+            <el-dropdown-item @click="logout">退出登录</el-dropdown-item>
+          </el-dropdown-menu>
+        </template>
+      </el-dropdown>
+
     </div>
   </div>
 
   <!-- 一级标签 -->
   <div class="first-tag">
-    <el-tabs v-model="activeName" class="demo-tabs">
+    <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick">
       <el-tab-pane name="law">
         <template #label>
-          <div  :class="{ 'highlight': showHighlight }" >
+          <div :class="{ 'highlight': showHighlight.law }">
             <div class="main-title">法律法规</div>
-            <div class="sub-title" v-if="totalFiles">({{ totalFiles }})</div>
+            <div class="sub-title">({{ totalFiles }})</div>
           </div>
         </template>
         <!-- 二级标签 -->
@@ -50,10 +59,9 @@
         <el-row :gutter="20">
           <!-- Add New 按钮 -->
           <el-col :span="100">
-            <el-upload action="file/upload" :http-request="customUpload" :data="uploadData"
-              :before-upload="beforeUpload" :on-success="handleSuccess" :on-progress="handleProgress"
-              :on-error="handleError" accept=".pdf" :show-file-list="false" :multiple="true"
-              :disabled="isMemoryProcessing" drag class="upload-card">
+            <el-upload action="file/upload" :data="uploadData" :before-upload="beforeUpload" :on-success="handleSuccess"
+              :on-progress="handleProgress" :on-error="handleError" accept=".pdf" :show-file-list="false"
+              :multiple="true" :disabled="isMemoryProcessing" drag class="upload-card">
               <el-card class="add-el-card" :style="{ width: '240px', height: '240px' }"
                 :class="{ uploading: loading, disabled: isMemoryProcessing }">
                 <el-icon>
@@ -104,8 +112,8 @@
               </div>
               <!-- 解析 -->
               <div class="content">
-                <embed :src="doc.docURL" class="doc-preview" />
-                <!-- <canvas id="pdf" :ref="el => initCanvas(el, doc)" style="width: 100%; height: 180px;"></canvas> -->
+                <!-- <embed :src="doc.docURL" class="doc-preview" /> -->
+                <canvas id="pdf" :ref="el => initCanvas(el, doc)" style="width: 100%; height: 180px;"></canvas>
                 <div class="ms" v-if="doc.parse">
                   解析进度：{{ doc.parseProgress }}%
                 </div>
@@ -135,8 +143,8 @@
               <!-- 毛玻璃上传中-->
               <div v-if="doc.isUploaded" class="glass-overlay">
                 <div class="progress-info">
-                  <el-progress v-if="doc.isUploaded" :percentage="doc.uploadProgress" :status="doc.uploadStatus"
-                    class="upload-progress" stroke-linecap="square" type="dashboard">
+                  <el-progress :percentage="doc.uploadProgress" status="success" class="upload-progress"
+                    stroke-linecap="square" type="dashboard">
                     <template #default="scoped">
                       <span class="percentage-value">上传进度:{{ doc.uploadProgress }}%</span>
                     </template>
@@ -177,18 +185,17 @@
       </el-tab-pane>
       <el-tab-pane name="policy">
         <template #label>
-          <div :class="{ 'highlight': showHighlight }">
+          <div :class="{ 'highlight': showHighlight.policy }">
             <div class="main-title">政策解读</div>
-            <div class="sub-title" v-if="totalPolicy">({{ totalPolicy }})</div>
+            <div class="sub-title">({{ totalPolicy }})</div>
           </div>
         </template>
         <el-row :gutter="20">
           <!-- Add New 按钮 -->
           <el-col :span="100">
-            <el-upload action="file/upload" :http-request="customUpload" :data="uploadData"
-              :before-upload="beforeUpload" :on-success="handleSuccess" :on-progress="handleProgress"
-              :on-error="handleError" accept=".pdf" :show-file-list="false" :multiple="true"
-              :disabled="isMemoryProcessing" drag class="upload-card">
+            <el-upload action="file/upload" :data="uploadData" :before-upload="beforeUpload" :on-success="handleSuccess"
+              :on-progress="handleProgress" :on-error="handleError" accept=".pdf" :show-file-list="false"
+              :multiple="true" :disabled="isMemoryProcessing" drag class="upload-card">
               <el-card class="add-el-card" :style="{ width: '240px', height: '240px' }"
                 :class="{ uploading: loading, disabled: isMemoryProcessing }">
                 <el-icon>
@@ -270,8 +277,8 @@
               <!-- 毛玻璃上传中-->
               <div v-if="doc.isUploaded" class="glass-overlay">
                 <div class="progress-info">
-                  <el-progress v-if="doc.isUploaded" :percentage="doc.uploadProgress" :status="doc.uploadStatus"
-                    class="upload-progress" stroke-linecap="square" type="dashboard">
+                  <el-progress :percentage="doc.uploadProgress" status="success" class="upload-progress"
+                    stroke-linecap="square" type="dashboard">
                     <template #default="scoped">
                       <span class="percentage-value">上传进度:{{ doc.uploadProgress }}%</span>
                     </template>
@@ -302,21 +309,25 @@
             </el-card>
           </el-col>
         </el-row>
+        <!-- 分页 -->
+        <div class="page">
+          <el-pagination layout="prev, pager, next" :total="1000" :page-size="num" @current-change="pageChange"
+            :page-count="maxPolicyPage" />
+        </div>
       </el-tab-pane>
       <el-tab-pane name="official">
         <template #label>
-          <div class="custom-tab-label">
+          <div :class="{ 'highlight': showHighlight.official }">
             <div class="main-title">公文</div>
-            <!-- <div class="sub-title">(0)</div> -->
+            <div class="sub-title">({{ totalOfficial }})</div>
           </div>
         </template>
         <el-row :gutter="20">
           <!-- Add New 按钮 -->
           <el-col :span="100">
-            <el-upload action="file/upload" :http-request="customUpload" :data="uploadData"
-              :before-upload="beforeUpload" :on-success="handleSuccess" :on-progress="handleProgress"
-              :on-error="handleError" accept=".pdf" :show-file-list="false" :multiple="true"
-              :disabled="isMemoryProcessing" drag class="upload-card">
+            <el-upload action="file/upload" :data="uploadData" :before-upload="beforeUpload" :on-success="handleSuccess"
+              :on-progress="handleProgress" :on-error="handleError" accept=".pdf" :show-file-list="false"
+              :multiple="true" :disabled="isMemoryProcessing" drag class="upload-card">
               <el-card class="add-el-card" :style="{ width: '240px', height: '240px' }"
                 :class="{ uploading: loading, disabled: isMemoryProcessing }">
                 <el-icon>
@@ -398,8 +409,8 @@
               <!-- 毛玻璃上传中-->
               <div v-if="doc.isUploaded" class="glass-overlay">
                 <div class="progress-info">
-                  <el-progress v-if="doc.isUploaded" :percentage="doc.uploadProgress" :status="doc.uploadStatus"
-                    class="upload-progress" stroke-linecap="square" type="dashboard">
+                  <el-progress :percentage="doc.uploadProgress" status="success" class="upload-progress"
+                    stroke-linecap="square" type="dashboard">
                     <template #default="scoped">
                       <span class="percentage-value">上传进度:{{ doc.uploadProgress }}%</span>
                     </template>
@@ -431,22 +442,27 @@
           </el-col>
         </el-row>
 
+        <!-- 分页 -->
+        <div class="page">
+          <el-pagination layout="prev, pager, next" :total="1000" :page-size="num" @current-change="pageChange"
+            :page-count="maxOfficialPage" />
+        </div>
+
 
       </el-tab-pane>
       <el-tab-pane name="report">
         <template #label>
-          <div class="custom-tab-label">
+          <div :class="{ 'highlight': showHighlight.report }">
             <div class="main-title">调研报告</div>
-            <!-- <div class="sub-title">(0)</div> -->
+            <div class="sub-title">({{ totalReport }})</div>
           </div>
         </template>
         <el-row :gutter="20">
           <!-- Add New 按钮 -->
           <el-col :span="100">
-            <el-upload action="file/upload" :http-request="customUpload" :data="uploadData"
-              :before-upload="beforeUpload" :on-success="handleSuccess" :on-progress="handleProgress"
-              :on-error="handleError" accept=".pdf" :show-file-list="false" :multiple="true"
-              :disabled="isMemoryProcessing" drag class="upload-card">
+            <el-upload action="file/upload" :data="uploadData" :before-upload="beforeUpload" :on-success="handleSuccess"
+              :on-progress="handleProgress" :on-error="handleError" accept=".pdf" :show-file-list="false"
+              :multiple="true" :disabled="isMemoryProcessing" drag class="upload-card">
               <el-card class="add-el-card" :style="{ width: '240px', height: '240px' }"
                 :class="{ uploading: loading, disabled: isMemoryProcessing }">
                 <el-icon>
@@ -528,8 +544,8 @@
               <!-- 毛玻璃上传中-->
               <div v-if="doc.isUploaded" class="glass-overlay">
                 <div class="progress-info">
-                  <el-progress v-if="doc.isUploaded" :percentage="doc.uploadProgress" :status="doc.uploadStatus"
-                    class="upload-progress" stroke-linecap="square" type="dashboard">
+                  <el-progress :percentage="doc.uploadProgress" status="success" class="upload-progress"
+                    stroke-linecap="square" type="dashboard">
                     <template #default="scoped">
                       <span class="percentage-value">上传进度:{{ doc.uploadProgress }}%</span>
                     </template>
@@ -560,22 +576,26 @@
             </el-card>
           </el-col>
         </el-row>
+        <!-- 分页 -->
+        <div class="page">
+          <el-pagination layout="prev, pager, next" :total="1000" :page-size="num" @current-change="pageChange"
+            :page-count="maxReportPage" />
+        </div>
       </el-tab-pane>
       <el-tab-pane name="book">
         <template #label>
-          <div class="custom-tab-label">
+          <div :class="{ 'highlight': showHighlight.book }">
             <div class="main-title">指导书</div>
-            <!-- <div class="sub-title">(0)</div> -->
+            <div class="sub-title">({{ totalBook }})</div>
           </div>
         </template>
 
         <el-row :gutter="20">
           <!-- Add New 按钮 -->
           <el-col :span="100">
-            <el-upload action="/file/upload" :http-request="customUpload" :data="uploadData"
-              :before-upload="beforeUpload" :on-success="handleSuccess" :on-progress="handleProgress"
-              :on-error="handleError" accept=".pdf" :show-file-list="false" :multiple="true"
-              :disabled="isMemoryProcessing" drag class="upload-card">
+            <el-upload action="/file/upload" :data="uploadData" :before-upload="beforeUpload"
+              :on-success="handleSuccess" :on-progress="handleProgress" :on-error="handleError" accept=".pdf"
+              :show-file-list="false" :multiple="true" :disabled="isMemoryProcessing" drag class="upload-card">
               <el-card class="add-el-card" :style="{ width: '240px', height: '240px' }"
                 :class="{ uploading: loading, disabled: isMemoryProcessing }">
                 <el-icon>
@@ -657,8 +677,8 @@
               <!-- 毛玻璃上传中-->
               <div v-if="doc.isUploaded" class="glass-overlay">
                 <div class="progress-info">
-                  <el-progress v-if="doc.isUploaded" :percentage="doc.uploadProgress" :status="doc.uploadStatus"
-                    class="upload-progress" stroke-linecap="square" type="dashboard">
+                  <el-progress :percentage="doc.uploadProgress" status="success" class="upload-progress"
+                    stroke-linecap="square" type="dashboard">
                     <template #default="scoped">
                       <span class="percentage-value">上传进度:{{ doc.uploadProgress }}%</span>
                     </template>
@@ -689,21 +709,26 @@
             </el-card>
           </el-col>
         </el-row>
+
+        <!-- 分页 -->
+        <div class="page">
+          <el-pagination layout="prev, pager, next" :total="1000" :page-size="num" @current-change="pageChange"
+            :page-count="maxBookPage" />
+        </div>
       </el-tab-pane>
       <el-tab-pane name="handlebook">
         <template #label>
-          <div class="custom-tab-label">
+          <div :class="{ 'highlight': showHighlight.handlebook }">
             <div class="main-title">用户及操作手册</div>
-            <!-- <div class="sub-title">(0)</div> -->
+            <div class="sub-title">({{ totalHandleBook }})</div>
           </div>
         </template>
         <el-row :gutter="20">
           <!-- Add New 按钮 -->
           <el-col :span="100">
-            <el-upload action="file/upload" :http-request="customUpload" :data="uploadData"
-              :before-upload="beforeUpload" :on-success="handleSuccess" :on-progress="handleProgress"
-              :on-error="handleError" accept=".pdf" :show-file-list="false" :multiple="true"
-              :disabled="isMemoryProcessing" drag class="upload-card">
+            <el-upload action="file/upload" :data="uploadData" :before-upload="beforeUpload" :on-success="handleSuccess"
+              :on-progress="handleProgress" :on-error="handleError" accept=".pdf" :show-file-list="false"
+              :multiple="true" :disabled="isMemoryProcessing" drag class="upload-card">
               <el-card class="add-el-card" :style="{ width: '240px', height: '240px' }"
                 :class="{ uploading: loading, disabled: isMemoryProcessing }">
                 <el-icon>
@@ -785,8 +810,8 @@
               <!-- 毛玻璃上传中-->
               <div v-if="doc.isUploaded" class="glass-overlay">
                 <div class="progress-info">
-                  <el-progress v-if="doc.isUploaded" :percentage="doc.uploadProgress" :status="doc.uploadStatus"
-                    class="upload-progress" stroke-linecap="square" type="dashboard">
+                  <el-progress :percentage="doc.uploadProgress" status="success" class="upload-progress"
+                    stroke-linecap="square" type="dashboard">
                     <template #default="scoped">
                       <span class="percentage-value">上传进度:{{ doc.uploadProgress }}%</span>
                     </template>
@@ -817,21 +842,26 @@
             </el-card>
           </el-col>
         </el-row>
+
+        <!-- 分页 -->
+        <div class="page">
+          <el-pagination layout="prev, pager, next" :total="1000" :page-size="num" @current-change="pageChange"
+            :page-count="maxHandlePage" />
+        </div>
       </el-tab-pane>
       <el-tab-pane name="repository">
         <template #label>
-          <div class="custom-tab-label">
+          <div :class="{ 'highlight': showHighlight.repository }">
             <div class="main-title">运维知识库</div>
-            <!-- <div class="sub-title">(0)</div> -->
+            <div class="sub-title">({{ totalRepository }})</div>
           </div>
         </template>
         <el-row :gutter="20">
           <!-- Add New 按钮 -->
           <el-col :span="100">
-            <el-upload action="/file/upload" :http-request="customUpload" :data="uploadData"
-              :before-upload="beforeUpload" :on-success="handleSuccess" :on-progress="handleProgress"
-              :on-error="handleError" accept=".pdf" :show-file-list="false" :multiple="true"
-              :disabled="isMemoryProcessing" drag class="upload-card">
+            <el-upload action="/file/upload" :data="uploadData" :before-upload="beforeUpload"
+              :on-success="handleSuccess" :on-progress="handleProgress" :on-error="handleError" accept=".pdf"
+              :show-file-list="false" :multiple="true" :disabled="isMemoryProcessing" drag class="upload-card">
               <el-card class="add-el-card" :style="{ width: '240px', height: '240px' }"
                 :class="{ uploading: loading, disabled: isMemoryProcessing }">
                 <el-icon>
@@ -913,8 +943,8 @@
               <!-- 毛玻璃上传中-->
               <div v-if="doc.isUploaded" class="glass-overlay">
                 <div class="progress-info">
-                  <el-progress v-if="doc.isUploaded" :percentage="doc.uploadProgress" :status="doc.uploadStatus"
-                    class="upload-progress" stroke-linecap="square" type="dashboard">
+                  <el-progress :percentage="doc.uploadProgress" status="success" class="upload-progress"
+                    stroke-linecap="square" type="dashboard">
                     <template #default="scoped">
                       <span class="percentage-value">上传进度:{{ doc.uploadProgress }}%</span>
                     </template>
@@ -945,21 +975,26 @@
             </el-card>
           </el-col>
         </el-row>
+
+        <!-- 分页 -->
+        <div class="page">
+          <el-pagination layout="prev, pager, next" :total="1000" :page-size="num" @current-change="pageChange"
+            :page-count="maxRepositoryPage" />
+        </div>
       </el-tab-pane>
       <el-tab-pane name="script">
         <template #label>
-          <div class="custom-tab-label">
+          <div :class="{ 'highlight': showHighlight.script }">
             <div class="main-title">数据库脚本</div>
-            <!-- <div class="sub-title">(0)</div> -->
+            <div class="sub-title">({{ totalScript }})</div>
           </div>
         </template>
         <el-row :gutter="20">
           <!-- Add New 按钮 -->
           <el-col :span="100">
-            <el-upload action="/file/upload" :http-request="customUpload" :data="uploadData"
-              :before-upload="beforeUpload" :on-success="handleSuccess" :on-progress="handleProgress"
-              :on-error="handleError" accept=".pdf" :show-file-list="false" :multiple="true"
-              :disabled="isMemoryProcessing" drag class="upload-card">
+            <el-upload action="/file/upload" :data="uploadData" :before-upload="beforeUpload"
+              :on-success="handleSuccess" :on-progress="handleProgress" :on-error="handleError" accept=".pdf"
+              :show-file-list="false" :multiple="true" :disabled="isMemoryProcessing" drag class="upload-card">
               <el-card class="add-el-card" :style="{ width: '240px', height: '240px' }"
                 :class="{ uploading: loading, disabled: isMemoryProcessing }">
                 <el-icon>
@@ -1041,7 +1076,7 @@
               <!-- 毛玻璃上传中-->
               <div v-if="doc.isUploaded" class="glass-overlay">
                 <div class="progress-info">
-                  <el-progress v-if="doc.isUploaded" :percentage="doc.uploadProgress" :status="doc.uploadStatus"
+                  <el-progress v-if="doc.isUploaded" :percentage="doc.uploadProgress" status="success"
                     class="upload-progress" stroke-linecap="square" type="dashboard">
                     <template #default="scoped">
                       <span class="percentage-value">上传进度:{{ doc.uploadProgress }}%</span>
@@ -1073,18 +1108,49 @@
             </el-card>
           </el-col>
         </el-row>
+
+        <!-- 分页 -->
+        <div class="page">
+          <el-pagination layout="prev, pager, next" :total="1000" :page-size="num" @current-change="pageChange"
+            :page-count="maxScriptPage" />
+        </div>
       </el-tab-pane>
     </el-tabs>
   </div>
 
-
+  <!-- 添加PDF预览弹窗 -->
+  <el-dialog v-model="previewVisible" title="PDF预览" width="80%" @closed="closePreview">
+    <div v-loading="previewLoading" class="pdf-preview-container">
+      <canvas id="pdf-canvas" class="pdf-canvas"></canvas>
+      <div v-if="!previewLoading" class="pdf-pagination">
+        <el-button :disabled="currentPage <= 1" @click="currentPage--; renderPage(currentPage)">
+          上一页
+        </el-button>
+        <span>第 {{ currentPage }} 页 / 共 {{ totalPages }} 页</span>
+        <el-button :disabled="currentPage >= totalPages" @click="currentPage++; renderPage(currentPage)">
+          下一页
+        </el-button>
+      </div>
+    </div>
+  </el-dialog>
 
 </template>
 
 <script setup>
 import { ref, onMounted, getCurrentInstance, reactive, onUnmounted, computed } from 'vue';
 import { ElMessage } from 'element-plus';
-import axios from 'axios';
+// 修改PDF.js配置方式
+import { getDocument, GlobalWorkerOptions, version } from 'pdfjs-dist'
+import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.mjs?url'
+
+// 重新组织pdfjsLib对象
+const pdfjsLib = {
+  getDocument,
+  GlobalWorkerOptions,
+  version
+}
+
+pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
 const { proxy } = getCurrentInstance();
 const ws = ref(null);
@@ -1096,16 +1162,29 @@ onMounted(() => {
   getTagList();
   getQuerySearch();
   connectWebsocket();
-  getPolicyList()
+  getPolicyList();
+  getOfficialList();
+  getReportList();
+  getScriptList();
+  getHandlebookList();
+  getRepositoryList();
+  getBookList();
 });
 
 // 分页
 const page = ref(1);
 const num = ref(23);
 
-const maxPage = ref(0);
-const totalFiles = ref(0);
+const maxPage = ref(0);//法律法规
+const maxPolicyPage = ref(0);//政策解读
+const maxHandlePage = ref(0);//用户手册
+const maxScriptPage = ref(0);//数据库脚本
+const maxOfficialPage = ref(0);//公文
+const maxRepositoryPage = ref(0);//运维知识库
+const maxReportPage = ref(0);//调研报告
+const maxBookPage = ref(0);//图书
 
+const totalFiles = ref(0);
 const circleUrl = ref('https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png');
 const activeName = ref('law')
 
@@ -1117,38 +1196,46 @@ const policy = ref([]);//政策解读
 const official = ref([]);//公文
 const report = ref([]);//调研报告
 const book = ref([]);//图书
+const selectedTags = ref([]);
 const isMemoryProcessing = ref(false); // 添加全局状态控制蒙层
 
 const mapDocumentData = (item) => ({
   title: item.file_name,
   type: 'pdf',
   docURL: item.file_path,
-  isProcessing: false,
+  isProcessing: false,//深度记忆中
   isUploaded: false,
-  uploadProgress: 0,
-  status: [1, 2].includes(item.status) ? '未记忆' : '已记忆',
-  tags: item.tag,
+  uploadProgress: 0,//上传进度
+  status: [1, 2].includes(item.status) ? '未记忆' : '已记忆',//记忆状态
+  tags: item.tag,//二级标签
   parse: false,
   parseProgress: 0,
   finish: true,
-  id: item.id,
+  id: item.id,//数据库对应唯一id
   isMemory: item.status === 3,
-  isEditing: false,
-  progress: item.status === 3 ? 100 : 0
+  isEditing: false,//编辑状态
+  progress: item.status === 3 ? 100 : 0,
+  uid: 0
 });
 
 // 获取文件列表
 const getFileList = async () => {
   const result = await proxy.$GET({
     url: 'file/getfilelist',
-    params: { page: page.value, num: num.value, type: 'law', keywords: searchQuery.value ?? '' }
+    params: { page: page.value, num: num.value, type: 'law', keywords: searchQuery.value ?? '', tag: selectedTags.value.join(',') }
   });
+  if (result.code == 0) {
 
-  if (result.code === 1) {
-    maxPage.value = Math.ceil(result.data.count / num.value);
-    totalFiles.value = result.data.count;
-    documents.value = result.data.data.map(mapDocumentData);
+    totalFiles.value = 0;
+    documents.value = [];
+    return false
+
   }
+  maxPage.value = Math.ceil(result.data.count / num.value);
+  totalFiles.value = result.data.count;
+  documents.value = result.data.data.map(mapDocumentData);
+
+
 };
 
 // 获取标签列表
@@ -1182,21 +1269,149 @@ const getPolicyList = async () => {
   var result = await proxy.$GET({
     url: 'file/getpolicy',
     params: {
-      page: 1,
+      page: page.value,
       num: num.value,
       type: 'policy',
       keywords: searchQuery.value ?? ''
     }
   });
-  if (result.code == 1) {
-    totalPolicy.value = result.data.count
-    policy.value = result.data.data.map(mapDocumentData);
+  if (result.code === 0) {
+    totalPolicy.value = 0;
+    policy.value = [];
+    return false
   }
+  maxPolicyPage.value = Math.ceil(result.data.count / num.value);
+  totalPolicy.value = result.data.count
+  policy.value = result.data.data.map(mapDocumentData);
+};
+
+const totalOfficial = ref(0);
+const getOfficialList = async () => {
+  var result = await proxy.$GET({
+    url: 'file/getofficial',
+    params: {
+      page: page.value,
+      num: num.value,
+      type: 'official',
+      keywords: searchQuery.value ?? ''
+    }
+  });
+  if (result.code === 0) {
+    totalOfficial.value = 0;
+    policy.value = [];
+    return false
+  }
+  maxOfficialPage.value = Math.ceil(result.data.count / num.value);
+  totalOfficial.value = result.data.count
+  official.value = result.data.data.map(mapDocumentData);
+};
+
+const totalReport = ref(0);
+const getReportList = async () => {
+  var result = await proxy.$GET({
+    url: 'file/getreport',
+    params: {
+      page: page.value,
+      num: num.value,
+      type: 'report',
+      keywords: searchQuery.value ?? ''
+    }
+  });
+  if (result.code === 0) {
+    totalReport.value = 0;
+    report.value = [];
+    return false
+  }
+  maxReportPage.value = Math.ceil(result.data.count / num.value);
+  totalReport.value = result.data.count
+  report.value = result.data.data.map(mapDocumentData);
+};
+
+const totalBook = ref(0);
+const getBookList = async () => {
+  var result = await proxy.$GET({
+    url: 'file/getbook',
+    params: {
+      page: page.value,
+      num: num.value,
+      type: 'book',
+      keywords: searchQuery.value ?? ''
+    }
+  });
+  if (result.code === 0) {
+    totalBook.value = 0;
+    book.value = [];
+    return false
+  }
+  maxBookPage.value = Math.ceil(result.data.count / num.value);
+  totalBook.value = result.data.count
+  book.value = result.data.data.map(mapDocumentData);
 };
 
 
-const MAX_RETRIES = 3;
-let retryCount = 0;
+const totalHandleBook = ref(0);
+const getHandlebookList = async () => {
+  var result = await proxy.$GET({
+    url: 'file/gethandlebook',
+    params: {
+      page: page.value,
+      num: num.value,
+      type: 'handlebook',
+      keywords: searchQuery.value ?? ''
+    }
+  });
+  if (result.code === 0) {
+    totalHandleBook.value = 0;
+    handlebook.value = [];
+    return false
+  }
+  maxHandlePage.value = Math.ceil(result.data.count / num.value);
+  totalHandleBook.value = result.data.count
+  handlebook.value = result.data.data.map(mapDocumentData);
+};
+
+const totalRepository = ref(0);
+const getRepositoryList = async () => {
+  var result = await proxy.$GET({
+    url: 'file/getrepository',
+    params: {
+      page: page.value,
+      num: num.value,
+      type: 'repository',
+      keywords: searchQuery.value ?? ''
+    }
+  });
+  if (result.code === 0) {
+    totalRepository.value = 0;
+    repository.value = [];
+    return false
+  }
+  maxRepositoryPage.value = Math.ceil(result.data.count / num.value);
+  totalRepository.value = result.data.count
+  repository.value = result.data.data.map(mapDocumentData);
+};
+
+
+const totalScript = ref(0);
+const getScriptList = async () => {
+  var result = await proxy.$GET({
+    url: 'file/getscript',
+    params: {
+      page: page.value,
+      num: num.value,
+      type: 'script',
+      keywords: searchQuery.value ?? ''
+    }
+  });
+  if (result.code === 0) {
+    totalScript.value = 0;
+    script.value = [];
+    return false
+  }
+  maxScriptPage.value = Math.ceil(result.data.count / num.value);
+  totalScript.value = result.data.count
+  script.value = result.data.data.map(mapDocumentData);
+};
 
 const connectWebsocket = async () => {
   try {
@@ -1204,24 +1419,22 @@ const connectWebsocket = async () => {
       ws.value.close();
     }
 
-    ws.value = new WebSocket('ws://192.168.6.185:8000/ws');
-    setupWebSocketHandler();
 
-    // 添加重连监听
-    ws.value.onclose = () => {
-      if (retryCount < MAX_RETRIES) {
-        retryCount++;
-        setTimeout(connectWebsocket, 2000 * retryCount);
-      }
+    ws.value = new WebSocket('ws://192.168.6.185:8000/ws');
+
+    // 错误处理中增加重试计数
+    ws.value.onerror = (error) => {
+      console.error('WebSocket错误:', error);
+      // ElMessage.error('WebSocket连接失败，请检查网络');
     };
 
     ws.value.onopen = () => {
       console.log('WebSocket连接已建立');
+      setupWebSocketHandler();
     };
 
-    ws.value.onerror = (error) => {
-      console.error('WebSocket错误:', error);
-    };
+
+
   } catch (error) {
     console.error('WebSocket连接失败:', error);
   }
@@ -1231,13 +1444,14 @@ const searchQuery = ref('');
 const tags = ref([]);
 
 const selectedTagsMap = reactive({});
-const selectedTags = ref([]);
+
 
 // 标签状态变化处理
 const handleTagChange = (tag) => {
   selectedTagsMap[tag] = !selectedTagsMap[tag];
   updateSelectedTags();
-  filterDocuments();
+  page.value = 1
+  getFileList()
 };
 
 // 更新选中标签数组
@@ -1249,54 +1463,19 @@ const updateSelectedTags = () => {
   );
 };
 
-// 文档筛选方法
-const filterDocuments = async () => {
-  const result = await proxy.$GET({
-    url: 'file/getfilelist',
-    params: {
-      tag: selectedTags.value.join(','),
-      page: 1,
-      num: num.value,
-      keywords: searchQuery.value ?? ''
-    }
-  });
-  documents.value = [];
-  documents.value = result.data.data.map(mapDocumentData);
-
-  maxPage.value = Math.ceil(result.data.count / num.value);
-  totalFiles.value = result.data.count;
-};
 
 // 上传相关状态
 const loading = ref(false);
 
 // 添加上传类型参数
-const uploadData = reactive({
-  type: activeName.value,
-});
+const uploadData = computed(() => ({
+  type: activeName.value
 
-// 修改自定义上传方法
-const customUpload = async (options) => {
-  const formData = new FormData();
-  formData.append('file', options.file);
-  formData.append('type', activeName.value);
-  try {
-    const res = await axios.post('file/upload', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      },
-    });
-    options.onSuccess(res.data);
-  } catch (err) {
-    options.onError(err);
-  }
-};
+}));
+
 
 // 在beforeUpload中更新参数
 const beforeUpload = (file) => {
-  uploadData.type = activeName.value;
-  uploadData.timestamp = Date.now();
-
   const isPDF = file.type === 'application/pdf';
   const isLt10M = file.size / 1024 / 1024 < 50;
 
@@ -1309,76 +1488,62 @@ const beforeUpload = (file) => {
     return false;
   }
 
-  if (activeName.value == 'law') {
-    documents.value.unshift({
-      title: file.name,
-      type: 'pdf',
-      docURL: '',
-      isProcessing: false,
-      isUploaded: true,
-      uploadProgress: 0,
-      uploadStatus: 'success',
-      status: '上传中',
-      tags: '',
-      parse: false,
-      parseProgress: 0,
-      finish: false,
-      id: Date.now(), // 临时ID
-      isMemory: false,
-      isEditing: false,
-      progress: 0,
-      uid: file.uid
-    });
-  } else if (activeName.value == 'policy') {
-    policy.value.unshift({
-      title: file.name,
-      type: 'pdf',
-      docURL: '',
-      isProcessing: false,
-      isUploaded: true,
-      uploadProgress: 0,
-      uploadStatus: 'success',
-      status: '上传中',
-      tags: '',
-      parse: false,
-      parseProgress: 0,
-      finish: false,
-      id: Date.now(), // 临时ID
-      isMemory: false,
-      isEditing: false,
-      progress: 0,
-      uid: file.uid
-    })
+  // 通用文档对象结构
+  const newDocument = {
+    title: file.name,
+    type: 'pdf',
+    docURL: '',
+    isProcessing: false,
+    isUploaded: true,
+    uploadProgress: 0,
+    status: '未记忆',
+    tags: '',
+    parse: false,
+    parseProgress: 0,
+    finish: false,
+    id: 0,
+    isMemory: false,
+    isEditing: false,
+    progress: 0,
+    uid: file.uid // 确保使用文件原生UID
+  };
 
+  // 根据当前标签页选择对应数组
+  const targetArray = {
+    law: documents,
+    policy: policy,
+    repository: repository,
+    script: script,
+    official: official,
+    report: report,
+    book: book,
+    handlebook: handlebook,
+
+  }[activeName.value]?.value;
+
+  if (targetArray) {
+    targetArray.unshift(newDocument);
+  } else {
+    console.error('未知的文档分类:', activeName.value);
+    return false;
   }
+
+
 
   return true;
 };
 
 // 上传进度条
 const handleProgress = (event, file) => {
-  // 通过文件名匹配文档对象
-  if (activeName.value == 'law') {
-    const targetDoc = documents.value.find(
-      (d) => d.uid === file.uid && d.isUploaded
-    );
-    if (targetDoc) {
-      // floor 向下取整
-      targetDoc.uploadProgress = Math.floor(event.percent);
-    }
-  } else if (activeName.value == 'policy') {
-    const targetDoc = policy.value.find(
-      (d) => d.uid === file.uid && d.isUploaded
-    );
-    if (targetDoc) {
-      // floor 向下取整
-      targetDoc.uploadProgress = Math.floor(event.percent);
-    }
+  const findInArray = (arr) => arr.value.find(d => d.uid === file.uid)
+  const targetDoc = findInArray(documents) || findInArray(policy) || findInArray(repository)
+    || findInArray(script)
+    || findInArray(official)
+    || findInArray(report)
+    || findInArray(book);
+  if (targetDoc) {
+    targetDoc.uploadProgress = event.percent;
   }
-
-  console.log(event);
-
-
 };
 
 // 统一的消息处理器
@@ -1435,7 +1600,7 @@ const startNextParse = () => {
   if (parseQueue.value.length === 0 || isParsing.value) return;
 
   isParsing.value = true;
-  const currentDoc = parseQueue.value[0];
+  const currentDoc = parseQueue.value[0] ? { ...parseQueue.value[0] } : null;
 
   const targetDoc = documents.value.find(d => d.id === currentDoc.id);
   if (targetDoc && !targetDoc.finish) {
@@ -1444,7 +1609,7 @@ const startNextParse = () => {
       type: 'parse',
       filename: currentDoc.file.name,
       id: currentDoc.id,
-      data: currentDoc.base64Data
+      data: currentDoc.base64Data ? currentDoc.base64Data : ''
     });
   } else {
     isParsing.value = false;
@@ -1454,45 +1619,54 @@ const startNextParse = () => {
 
 const handleSuccess = async (response, uploadFile) => {
   loading.value = false;
-  if (activeName.value == 'law') {
-    totalFiles.value += 1;
-    const targetIndex = documents.value.findIndex(
-      (d) => d.title === uploadFile.name && d.isUploaded
-    );
 
-    if (targetIndex !== -1) {
-      const updatedDoc = {
-        ...documents.value[targetIndex],
-        uploadProgress: 100,
-        docURL: response.url,
-        isUploaded: false,
-        id: response.id,
-        status: '未记忆',
-        parse: true
-      };
-      // splice 方法用于替换数组中的元素
-      documents.value.splice(targetIndex, 1, updatedDoc);
-    }
-  } else if (activeName.value == 'policy') {
-       totalFiles.value += 1;
-    const targetIndex = policy.value.findIndex(
-      (d) => d.title === uploadFile.name && d.isUploaded
-    );
+  // 根据分类更新总数
+  const counterMap = {
+    law: totalFiles,
+    policy: totalPolicy,
+    official: totalOfficial,
+    repository: totalRepository,
+    script: totalScript,
+    report: totalReport,
+    book: totalBook,
+    handlebook: totalHandleBook,
+  }[activeName.value];
 
-    if (targetIndex !== -1) {
-      const updatedDoc = {
-        ...policy.value[targetIndex],
-        uploadProgress: 100,
-        docURL: response.url,
-        isUploaded: false,
-        id: response.id,
-        status: '未记忆',
-        parse: true
-      };
-      // splice 方法用于替换数组中的元素
-      policy.value.splice(targetIndex, 1, updatedDoc);
+  if (counterMap) {
+    counterMap.value++;
+  }
+
+
+  // 查找并更新对应文档状态
+  const targetArrayMap = {
+    law: documents,
+    policy: policy,
+    repository: repository,
+    script: script,
+    official: official,
+    report: report,
+    book: book
+  }[activeName.value]?.value;
+
+  if (targetArrayMap) {
+    const targetDoc = targetArrayMap.find(d => d.uid === uploadFile.uid);
+    if (targetDoc) {
+      // 关闭上传状态，开启解析状态
+      targetDoc.docURL = response.data.url;
+      setTimeout(() => {
+        targetDoc.isUploaded = false;
+      }, 500)
+
     }
   }
+
+  // 发送消息前检查连接状态
+  if (ws.value?.readyState !== WebSocket.OPEN) {
+    // ElMessage.warning('websocket连接未就绪');
+    console.log("websocket连接未就绪");
+    return;
+  }
+
 
   // 获取上传文件对象
   const file = uploadFile.raw;
@@ -1500,11 +1674,11 @@ const handleSuccess = async (response, uploadFile) => {
   // 转换为Base64后加入队列
   const base64Data = await fileToBase64(file);
   addToParseQueue({
-    id: response.id,
+    id: response.data.id,
     file: uploadFile.raw,
     base64Data
   });
-};
+}
 
 // 添加文件到解析队列
 const addToParseQueue = (fileData) => {
@@ -1561,8 +1735,6 @@ const simulateProgress = async (doc) => {
       filename: doc.title,
       id: doc.id,
     });
-
-
   }
 };
 
@@ -1571,9 +1743,55 @@ const pdfUrl = ref('');
 
 // 预览pdf
 const previewPdf = async (doc) => {
-  showPdf.value = true;
-  pdfUrl.value = doc.docURL;
-};
+  previewVisible.value = true
+  previewLoading.value = true
+  pdfUrl.value = doc.docURL
+
+  try {
+    // 初始化PDF文档
+    const loadingTask = pdfjsLib.getDocument(pdfUrl.value)
+    pdfDoc = await loadingTask.promise
+    totalPages.value = pdfDoc.numPages
+
+    // 渲染第一页
+    await renderPage(currentPage.value)
+  } catch (error) {
+    ElMessage.error('PDF加载失败: ' + error.message)
+    previewVisible.value = false
+  } finally {
+    previewLoading.value = false
+  }
+}
+
+// 添加页面渲染方法
+const renderPage = async (num) => {
+  if (!pdfDoc || num < 1 || num > totalPages.value) return
+
+  const page = await pdfDoc.getPage(num)
+  const canvas = document.getElementById('pdf-canvas')
+  const context = canvas.getContext('2d')
+
+  // 设置缩放比例
+  const viewport = page.getViewport({ scale: 1.5 })
+  canvas.height = viewport.height
+  canvas.width = viewport.width
+
+  // 渲染页面
+  await page.render({
+    canvasContext: context,
+    viewport: viewport
+  }).promise
+}
+
+// 添加弹窗关闭处理
+const closePreview = () => {
+  previewVisible.value = false
+  if (pdfDoc) {
+    pdfDoc.destroy()
+    pdfDoc = null
+  }
+}
+
 const tagText = ref(null);
 
 const a = ref('');
@@ -1615,25 +1833,65 @@ const cancelEdit = (doc) => {
 };
 
 // 点击页数
-const pageChange = async (num) => {
-  page.value = num;
-  var result = await proxy.$GET({
-    url: 'file/getfilelist',
-    params: { page: page.value, num: num.value }
-  });
+const pageChange = async (data) => {
+  page.value = data;
 
-  documents.value = [];
-  documents.value = result.data.data.map(mapDocumentData);
+  //根据不调标签页调用方法
+  const targetArrayMap = {
+    law: getFileList,
+    policy: getPolicyList,
+    official: getOfficialList,
+    repository: getRepositoryList,
+    script: getScriptList,
+    report: getReportList,
+    book: getBookList,
+    handlebook: getHandlebookList,
+  }[activeName.value];
+
+  if (targetArrayMap) {
+    targetArrayMap();
+  }
+
 };
-const showHighlight = ref(false);
+
+const showHighlight = reactive({
+  law: false,
+  policy: false,
+  official: false,
+  report: false,
+  book: false,
+  handlebook: false,
+  repository: false,
+  script: false
+});
 // 搜索
 const searchDocuments = async () => {
-  documents.value = [];
-  policy.value = []
-  getFileList();
-  getPolicyList();
-  showHighlight.value = totalFiles.value > 0 && totalPolicy.value > 0;
-  console.log(showHighlight.value);
+  if (searchQuery.value === '') {
+    return false;
+  }
+  page.value = 1;
+
+  // 获取所有分类数据
+  await Promise.all([
+    getFileList(),
+    getPolicyList(),
+    getOfficialList(),
+    getReportList(),
+    getBookList(),
+    getHandlebookList(),
+    getRepositoryList(),
+    getScriptList()
+  ]);
+
+  // 单独设置每个分类的高亮状态
+  showHighlight.law = totalFiles.value > 0;
+  showHighlight.policy = totalPolicy.value > 0;
+  showHighlight.official = totalOfficial.value > 0;
+  showHighlight.report = totalReport.value > 0;
+  showHighlight.book = totalBook.value > 0;
+  showHighlight.handlebook = totalHandleBook.value > 0;
+  showHighlight.repository = totalRepository.value > 0;
+  showHighlight.script = totalScript.value > 0;
 };
 
 const restaurants = ref([]);
@@ -1657,81 +1915,24 @@ const resetAll = async () => {
   searchQuery.value = '';
   selectedTags.value = []
   page.value = 1;
-  showHighlight.value = false;
-  var result = await proxy.$GET({
-    url: 'file/getfilelist',
-    params: { page: page.value, num: num.value }
-  });
-
-  documents.value = [];
-
-  documents.value = result.data.data.map(mapDocumentData);
-
-  maxPage.value = Math.ceil(result.data.count / num.value);
-  totalFiles.value = result.data.count;
+  getFileList();
+  getPolicyList();
+  getBookList();
+  getHandlebookList();
+  getOfficialList();
+  getReportList();
+  getRepositoryList();
+  getScriptList();
+  // 循环遍历所有分类，将高亮状态重置为false
+  Object.keys(showHighlight).forEach((key) => {
+    showHighlight[key] = false;
+  })
 };
 
 const handleSelect = (item) => {
   console.log(item);
 };
 
-// 已记忆
-const memorized = async () => {
-  var result = await proxy.$GET({
-    url: 'file/getfilelist',
-    params: {
-      page: 1,
-      num: num.value,
-      status: 3,
-      tag: selectedTags.value.join(','),
-      keywords: searchQuery.value
-    }
-  });
-  if (result.code == 1) {
-    documents.value = [];
-    result.data.data.map((item) => {
-      documents.value.push({
-        title: item.file_name,
-        type: 'pdf',
-        docURL: item.file_path,
-        isProcessing: false,
-        isUploaded: false,
-        uploadProgress: 0,
-        uploadStatus: 'success',
-        status: item.status == 2 || item.status == 1 ? '未记忆' : '已记忆',
-        tags: item.tag,
-        parse: false,
-        finish: true,
-        id: item.id,
-        isMemory: item.status == 3 ? true : false,
-        isEditing: false, // 新增状态控制编辑模式
-        progress: 100
-      });
-    });
-  } else {
-    ElMessage.error('暂无已记忆的文档');
-  }
-};
-
-// 未记忆
-const noMemory = async () => {
-  var result = await proxy.$GET({
-    url: 'file/getfilelist',
-    params: {
-      page: 1,
-      num: num.value,
-      status: 1 || 2,
-      tag: selectedTags.value.join(','),
-      keywords: searchQuery.value
-    }
-  });
-  if (result.code == 1) {
-    documents.value = [];
-    documents.value = result.data.data.map(mapDocumentData);
-  } else {
-    ElMessage.error('暂无未记忆的文档');
-  }
-};
 
 // 新增文件名截断方法
 const truncateFileName = (name, maxLength) => {
@@ -1750,6 +1951,40 @@ const truncateFileName = (name, maxLength) => {
   )}${extension}`;
 };
 
+const logout = () => {
+  proxy.$router.push('/login');
+}
+
+const handleClick = (tab, event) => {
+  activeName.value = tab.props.name;
+};
+
+// 新增canvas初始化方法
+const initCanvas = async (canvas, doc) => {
+  if (!canvas || !doc?.docURL) return
+
+  const loadingTask = pdfjsLib.getDocument(doc.docURL)
+  try {
+    const pdf = await loadingTask.promise
+    const page = await pdf.getPage(1)
+
+    const viewport = page.getViewport({ scale: 1.5 })
+    const context = canvas.getContext('2d')
+
+    canvas.height = viewport.height
+    canvas.width = viewport.width
+
+    const renderContext = {
+      canvasContext: context,
+      viewport: viewport
+    }
+
+    await page.render(renderContext).promise
+  } catch (error) {
+    console.error('PDF渲染失败:', error)
+  }
+}
+
 // 添加清理逻辑
 onUnmounted(() => {
   if (ws.value) {
@@ -1759,18 +1994,32 @@ onUnmounted(() => {
   parseQueue.value = [];
 });
 
-
+// 添加预览相关状态
+const previewVisible = ref(false)
+const previewLoading = ref(false)
+const pdfPage = ref(null)
+const currentPage = ref(1)
+const totalPages = ref(0)
+let pdfDoc = null
 
 </script>
 
 <style scoped>
 @import url('/assets/css/file.css');
 
-.highlight .main-title {
-  color: #409eff!important;
+.pdf-preview-container {
+  position: relative;
+  min-height: 600px;
 }
 
-.highlight .sub-title {
-  color: #409eff!important;
+.pdf-canvas {
+  width: 100%;
+  border: 1px solid #ebeef5;
+  margin-bottom: 20px;
+}
+
+.pdf-pagination {
+  text-align: center;
+  margin-top: 20px;
 }
 </style>

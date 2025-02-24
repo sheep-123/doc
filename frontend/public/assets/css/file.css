@@ -372,7 +372,7 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    margin-right: 10px;
+    margin-right: 50px;
     .left {
       box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3),
         -2px 0px 4px rgba(0, 0, 0, 0.3);
@@ -400,6 +400,14 @@
   padding: 1px;
   gap: 10px;
   margin: 10px;
+}
+
+.highlight .main-title {
+  color: #409eff !important;
+}
+
+.highlight .sub-title {
+  color: #409eff !important;
 }
 
 :deep(.multi-tag) {
@@ -443,6 +451,14 @@
 
 :deep(.el-tabs__nav-wrap:after ){
   display: none;
+}
+
+:deep(.el-tabs__nav-prev){
+  margin-top: 20px;
+} 
+
+:deep(.el-tabs__nav-next){
+  margin-top: 20px;
 }
 
 @media screen and (max-width: 768px) {

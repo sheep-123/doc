@@ -62,7 +62,6 @@ exports.getFileList = async (req, res) => {
       order: [['id', 'DESC']],
       offset: (page - 1) * num,
       limit: Number(num)
-      // limit: 1
     });
 
     // 响应格式处理
@@ -104,6 +103,8 @@ exports.upload = [
           data: null
         });
       }
+
+      // const { type } = req.query; // 获取前端传递的type参数
 
       const { type } = req.body; // 获取前端传递的type参数
       if (!type) {
@@ -417,6 +418,324 @@ exports.deleteFile = async (req, res) => {
 };
 
 exports.getPolicy = async (req, res) => {
+  try {
+    // 获取请求参数
+    const {
+      page = 1,
+      num = 23,
+      keywords = '',
+      status = 0,
+      type=''
+    } = req.query;
+
+    // 构建查询条件
+    const where = {};
+    if (keywords) where.file_name = { [Op.like]: `%${keywords}%` };
+    if (status) where.status = status;
+    if(type) where.type = type;
+
+    // 分页查询
+    const result = await File.findAndCountAll({
+      where,
+      order: [['id', 'DESC']],
+      offset: (page - 1) * num,
+      limit: Number(num)
+    });
+
+    // 响应格式处理
+    const responseData = {
+      count: result.count,
+      data: result.rows
+    };
+
+    if (result.rows.length > 0) {
+      res.status(200).json({
+        code: 1,
+        msg: '获取文件成功',
+        data: responseData
+      });
+    } else {
+      res.status(200).json({
+        code: 0,
+        msg: '暂无文件',
+        data: null
+      });
+    }
+  } catch (err) {
+    res.status(500).json({
+      code: 500,
+      msg: `服务器错误: ${err.message}`,
+      data: null
+    });
+  }
+};
+
+exports.getOfficial = async (req, res) => {
+  try {
+    // 获取请求参数
+    const {
+      page = 1,
+      num = 23,
+      keywords = '',
+      status = 0,
+      type=''
+    } = req.query;
+
+    // 构建查询条件
+    const where = {};
+    if (keywords) where.file_name = { [Op.like]: `%${keywords}%` };
+    if (status) where.status = status;
+    if(type) where.type = type;
+
+    // 分页查询
+    const result = await File.findAndCountAll({
+      where,
+      order: [['id', 'DESC']],
+      offset: (page - 1) * num,
+      limit: Number(num)
+    });
+
+    // 响应格式处理
+    const responseData = {
+      count: result.count,
+      data: result.rows
+    };
+
+    if (result.rows.length > 0) {
+      res.status(200).json({
+        code: 1,
+        msg: '获取文件成功',
+        data: responseData
+      });
+    } else {
+      res.status(200).json({
+        code: 0,
+        msg: '暂无文件',
+        data: null
+      });
+    }
+  } catch (err) {
+    res.status(500).json({
+      code: 500,
+      msg: `服务器错误: ${err.message}`,
+      data: null
+    });
+  }
+};
+
+exports.getReport = async (req, res) => {
+  try {
+    // 获取请求参数
+    const {
+      page = 1,
+      num = 23,
+      keywords = '',
+      status = 0,
+      type=''
+    } = req.query;
+
+    // 构建查询条件
+    const where = {};
+    if (keywords) where.file_name = { [Op.like]: `%${keywords}%` };
+    if (status) where.status = status;
+    if(type) where.type = type;
+
+    // 分页查询
+    const result = await File.findAndCountAll({
+      where,
+      order: [['id', 'DESC']],
+      offset: (page - 1) * num,
+      limit: Number(num)
+    });
+
+    // 响应格式处理
+    const responseData = {
+      count: result.count,
+      data: result.rows
+    };
+
+    if (result.rows.length > 0) {
+      res.status(200).json({
+        code: 1,
+        msg: '获取文件成功',
+        data: responseData
+      });
+    } else {
+      res.status(200).json({
+        code: 0,
+        msg: '暂无文件',
+        data: null
+      });
+    }
+  } catch (err) {
+    res.status(500).json({
+      code: 500,
+      msg: `服务器错误: ${err.message}`,
+      data: null
+    });
+  }
+};
+
+exports.getBook = async (req, res) => {
+  try {
+    // 获取请求参数
+    const {
+      page = 1,
+      num = 23,
+      keywords = '',
+      status = 0,
+      type=''
+    } = req.query;
+
+    // 构建查询条件
+    const where = {};
+    if (keywords) where.file_name = { [Op.like]: `%${keywords}%` };
+    if (status) where.status = status;
+    if(type) where.type = type;
+
+    // 分页查询
+    const result = await File.findAndCountAll({
+      where,
+      order: [['id', 'DESC']],
+      offset: (page - 1) * num,
+      limit: Number(num)
+    });
+
+    // 响应格式处理
+    const responseData = {
+      count: result.count,
+      data: result.rows
+    };
+
+    if (result.rows.length > 0) {
+      res.status(200).json({
+        code: 1,
+        msg: '获取文件成功',
+        data: responseData
+      });
+    } else {
+      res.status(200).json({
+        code: 0,
+        msg: '暂无文件',
+        data: null
+      });
+    }
+  } catch (err) {
+    res.status(500).json({
+      code: 500,
+      msg: `服务器错误: ${err.message}`,
+      data: null
+    });
+  }
+};
+
+exports.getHandleBook = async (req, res) => {
+  try {
+    // 获取请求参数
+    const {
+      page = 1,
+      num = 23,
+      keywords = '',
+      status = 0,
+      type=''
+    } = req.query;
+
+    // 构建查询条件
+    const where = {};
+    if (keywords) where.file_name = { [Op.like]: `%${keywords}%` };
+    if (status) where.status = status;
+    if(type) where.type = type;
+
+    // 分页查询
+    const result = await File.findAndCountAll({
+      where,
+      order: [['id', 'DESC']],
+      offset: (page - 1) * num,
+      limit: Number(num)
+    });
+
+    // 响应格式处理
+    const responseData = {
+      count: result.count,
+      data: result.rows
+    };
+
+    if (result.rows.length > 0) {
+      res.status(200).json({
+        code: 1,
+        msg: '获取文件成功',
+        data: responseData
+      });
+    } else {
+      res.status(200).json({
+        code: 0,
+        msg: '暂无文件',
+        data: null
+      });
+    }
+  } catch (err) {
+    res.status(500).json({
+      code: 500,
+      msg: `服务器错误: ${err.message}`,
+      data: null
+    });
+  }
+};
+
+exports.getRepository = async (req, res) => {
+  try {
+    // 获取请求参数
+    const {
+      page = 1,
+      num = 23,
+      keywords = '',
+      status = 0,
+      type=''
+    } = req.query;
+
+    // 构建查询条件
+    const where = {};
+    if (keywords) where.file_name = { [Op.like]: `%${keywords}%` };
+    if (status) where.status = status;
+    if(type) where.type = type;
+
+    // 分页查询
+    const result = await File.findAndCountAll({
+      where,
+      order: [['id', 'DESC']],
+      offset: (page - 1) * num,
+      limit: Number(num)
+    });
+
+    // 响应格式处理
+    const responseData = {
+      count: result.count,
+      data: result.rows
+    };
+
+    if (result.rows.length > 0) {
+      res.status(200).json({
+        code: 1,
+        msg: '获取文件成功',
+        data: responseData
+      });
+    } else {
+      res.status(200).json({
+        code: 0,
+        msg: '暂无文件',
+        data: null
+      });
+    }
+  } catch (err) {
+    res.status(500).json({
+      code: 500,
+      msg: `服务器错误: ${err.message}`,
+      data: null
+    });
+  }
+};
+
+exports.getScript = async (req, res) => {
   try {
     // 获取请求参数
     const {
