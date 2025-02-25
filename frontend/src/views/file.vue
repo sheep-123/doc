@@ -1546,6 +1546,73 @@ const handleProgress = (event, file) => {
   }
 };
 
+
+const handleSuccess = async (response, uploadFile) => {
+  loading.value = false;
+
+  // 根据分类更新总数
+  const counterMap = {
+    law: totalFiles,
+    policy: totalPolicy,
+    official: totalOfficial,
+    repository: totalRepository,
+    script: totalScript,
+    report: totalReport,
+    book: totalBook,
+    handlebook: totalHandleBook,
+  }[activeName.value];
+
+  if (counterMap) {
+    counterMap.value++;
+  }
+
+
+  // 查找并更新对应文档状态
+  const targetArrayMap = {
+    law: documents,
+    policy: policy,
+    repository: repository,
+    script: script,
+    official: official,
+    report: report,
+    book: book
+  }[activeName.value]?.value;
+
+  if (targetArrayMap) {
+    const targetDoc = targetArrayMap.find(d => d.uid === uploadFile.uid);
+    if (targetDoc) {
+      // 关闭上传状态，开启解析状态
+      targetDoc.docURL = response.data.url;
+      targetDoc.id=response.data.id;
+      setTimeout(() => {
+        targetDoc.isUploaded = false;
+      }, 500)
+
+    }
+  }
+
+  // 发送消息前检查连接状态
+  if (ws.value?.readyState !== WebSocket.OPEN) {
+    // ElMessage.warning('websocket连接未就绪');
+    console.log("websocket连接未就绪");
+    return;
+  }
+
+  console.log(response);
+
+
+  // 获取上传文件对象
+  const file = uploadFile.raw;
+
+  // 转换为Base64后加入队列
+  const base64Data = await fileToBase64(file);
+  addToParseQueue({
+    id: response.data.id,
+    file: uploadFile.raw,
+    base64Data
+  });
+}
+
 // 统一的消息处理器
 const setupWebSocketHandler = () => {
   if (!ws.value) return;
@@ -1557,7 +1624,6 @@ const setupWebSocketHandler = () => {
 
       // 立即从解析队列中移除失败项
       parseQueue.value = parseQueue.value.filter(item => item.id != data.id);
-
       try {
         const result = await proxy.$GET({
           url: 'file/deletefile',
@@ -1600,10 +1666,12 @@ const startNextParse = () => {
   if (parseQueue.value.length === 0 || isParsing.value) return;
 
   isParsing.value = true;
-  const currentDoc = parseQueue.value[0] ? { ...parseQueue.value[0] } : null;
+  console.log(parseQueue.value);
+  const currentDoc = parseQueue.value[0];
 
   const targetDoc = documents.value.find(d => d.id === currentDoc.id);
-  if (targetDoc && !targetDoc.finish) {
+  console.log(targetDoc);
+  if (targetDoc) {
     targetDoc.parse = true;
     sendViaWebSocket({
       type: 'parse',
@@ -1612,73 +1680,14 @@ const startNextParse = () => {
       data: currentDoc.base64Data ? currentDoc.base64Data : ''
     });
   } else {
+    // 新增：当找不到文档时自动清理队列
+    parseQueue.value.shift();  
     isParsing.value = false;
     startNextParse();
   }
 };
 
-const handleSuccess = async (response, uploadFile) => {
-  loading.value = false;
 
-  // 根据分类更新总数
-  const counterMap = {
-    law: totalFiles,
-    policy: totalPolicy,
-    official: totalOfficial,
-    repository: totalRepository,
-    script: totalScript,
-    report: totalReport,
-    book: totalBook,
-    handlebook: totalHandleBook,
-  }[activeName.value];
-
-  if (counterMap) {
-    counterMap.value++;
-  }
-
-
-  // 查找并更新对应文档状态
-  const targetArrayMap = {
-    law: documents,
-    policy: policy,
-    repository: repository,
-    script: script,
-    official: official,
-    report: report,
-    book: book
-  }[activeName.value]?.value;
-
-  if (targetArrayMap) {
-    const targetDoc = targetArrayMap.find(d => d.uid === uploadFile.uid);
-    if (targetDoc) {
-      // 关闭上传状态，开启解析状态
-      targetDoc.docURL = response.data.url;
-      setTimeout(() => {
-        targetDoc.isUploaded = false;
-      }, 500)
-
-    }
-  }
-
-  // 发送消息前检查连接状态
-  if (ws.value?.readyState !== WebSocket.OPEN) {
-    // ElMessage.warning('websocket连接未就绪');
-    console.log("websocket连接未就绪");
-    return;
-  }
-
-
-  // 获取上传文件对象
-  const file = uploadFile.raw;
-
-  // 转换为Base64后加入队列
-  const base64Data = await fileToBase64(file);
-  addToParseQueue({
-    id: response.data.id,
-    file: uploadFile.raw,
-    base64Data
-  });
-}
 
 // 添加文件到解析队列
 const addToParseQueue = (fileData) => {

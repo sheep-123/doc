@@ -58,12 +58,16 @@ if (!fs.existsSync(uploadDir)) {
 }
 
 // 配置静态资源访问
-app.use('/uploads', express.static(uploadDir));
-// app.use('/uploads', express.static('/data/uploads')); // 内网保存路径
+// app.use('/uploads', express.static(uploadDir));
+app.use('/uploads', express.static('/data/uploads')); // 内网保存路径
 
 // set port, listen for requests
 // 环境变量优先，默认
 const PORT = process.env.PORT || 7777;
-app.listen(PORT, () => {
+// app.listen(PORT, () => {
+//   console.log(`Server is running on port ${PORT}.`);
+// });
+
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server is running on port ${PORT}.`);
 });
