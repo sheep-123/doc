@@ -59,6 +59,7 @@ if (!fs.existsSync(uploadDir)) {
 
 // 配置静态资源访问
 app.use('/uploads', express.static(uploadDir));
+// app.use('/uploads', express.static('/data/uploads')); // 内网保存路径
 
 // set port, listen for requests
 // 环境变量优先，默认

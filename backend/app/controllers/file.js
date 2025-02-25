@@ -10,7 +10,8 @@ const fs = require('fs');
 // 配置multer存储
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    // 修改为固定PDF存储路径
+    // 修改为内网服务器绝对路径（示例路径，请根据实际服务器目录修改）
+    // const uploadPath = '/data/uploads/pdf'; // 替换为实际的服务器存储路径
     const uploadPath = path.join(__dirname, '../uploads/pdf');
 
     // 自动创建目录
@@ -46,7 +47,7 @@ exports.getFileList = async (req, res) => {
       tag = '',
       keywords = '',
       status = 0,
-      type=''
+      type = ''
     } = req.query;
 
     // 构建查询条件
@@ -54,7 +55,7 @@ exports.getFileList = async (req, res) => {
     if (tag) where.tag = tag;
     if (keywords) where.file_name = { [Op.like]: `%${keywords}%` };
     if (status) where.status = status;
-    if(type) where.type = type;
+    if (type) where.type = type;
 
     // 分页查询
     const result = await File.findAndCountAll({
@@ -126,8 +127,12 @@ exports.upload = [
         .replace(/[^a-zA-Z0-9\u4e00-\u9fa5\-_.]/g, '');
 
       // 生成完整URL路径
-      const domain = `${req.protocol}://${req.get('host')}`;
+      // const domain = `${req.protocol}://${req.get('host')}`;
+      // const domain="http://loaclhost:7777"
+      // 在生成URL的部分需要同步修改：
       const filePath = `/uploads/pdf/${req.file.filename}`;
+      // 如果使用独立域名或端口，可以改为：
+      const domain = 'http://192.168.30.23:7777'; // 替换为实际内网地址
 
       const fileInfo = {
         file_name: cleanFileName,
@@ -425,14 +430,14 @@ exports.getPolicy = async (req, res) => {
       num = 23,
       keywords = '',
       status = 0,
-      type=''
+      type = ''
     } = req.query;
 
     // 构建查询条件
     const where = {};
     if (keywords) where.file_name = { [Op.like]: `%${keywords}%` };
     if (status) where.status = status;
-    if(type) where.type = type;
+    if (type) where.type = type;
 
     // 分页查询
     const result = await File.findAndCountAll({
@@ -478,14 +483,14 @@ exports.getOfficial = async (req, res) => {
       num = 23,
       keywords = '',
       status = 0,
-      type=''
+      type = ''
     } = req.query;
 
     // 构建查询条件
     const where = {};
     if (keywords) where.file_name = { [Op.like]: `%${keywords}%` };
     if (status) where.status = status;
-    if(type) where.type = type;
+    if (type) where.type = type;
 
     // 分页查询
     const result = await File.findAndCountAll({
@@ -531,14 +536,14 @@ exports.getReport = async (req, res) => {
       num = 23,
       keywords = '',
       status = 0,
-      type=''
+      type = ''
     } = req.query;
 
     // 构建查询条件
     const where = {};
     if (keywords) where.file_name = { [Op.like]: `%${keywords}%` };
     if (status) where.status = status;
-    if(type) where.type = type;
+    if (type) where.type = type;
 
     // 分页查询
     const result = await File.findAndCountAll({
@@ -584,14 +589,14 @@ exports.getBook = async (req, res) => {
       num = 23,
       keywords = '',
       status = 0,
-      type=''
+      type = ''
     } = req.query;
 
     // 构建查询条件
     const where = {};
     if (keywords) where.file_name = { [Op.like]: `%${keywords}%` };
     if (status) where.status = status;
-    if(type) where.type = type;
+    if (type) where.type = type;
 
     // 分页查询
     const result = await File.findAndCountAll({
@@ -637,14 +642,14 @@ exports.getHandleBook = async (req, res) => {
       num = 23,
       keywords = '',
       status = 0,
-      type=''
+      type = ''
     } = req.query;
 
     // 构建查询条件
     const where = {};
     if (keywords) where.file_name = { [Op.like]: `%${keywords}%` };
     if (status) where.status = status;
-    if(type) where.type = type;
+    if (type) where.type = type;
 
     // 分页查询
     const result = await File.findAndCountAll({
@@ -690,14 +695,14 @@ exports.getRepository = async (req, res) => {
       num = 23,
       keywords = '',
       status = 0,
-      type=''
+      type = ''
     } = req.query;
 
     // 构建查询条件
     const where = {};
     if (keywords) where.file_name = { [Op.like]: `%${keywords}%` };
     if (status) where.status = status;
-    if(type) where.type = type;
+    if (type) where.type = type;
 
     // 分页查询
     const result = await File.findAndCountAll({
@@ -743,14 +748,14 @@ exports.getScript = async (req, res) => {
       num = 23,
       keywords = '',
       status = 0,
-      type=''
+      type = ''
     } = req.query;
 
     // 构建查询条件
     const where = {};
     if (keywords) where.file_name = { [Op.like]: `%${keywords}%` };
     if (status) where.status = status;
-    if(type) where.type = type;
+    if (type) where.type = type;
 
     // 分页查询
     const result = await File.findAndCountAll({

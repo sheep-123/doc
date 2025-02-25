@@ -112,8 +112,8 @@
               </div>
               <!-- 解析 -->
               <div class="content">
-                <!-- <embed :src="doc.docURL" class="doc-preview" /> -->
-                <canvas id="pdf" :ref="el => initCanvas(el, doc)" style="width: 100%; height: 180px;"></canvas>
+                <embed :src="doc.docURL" class="doc-preview" />
+                <!-- <canvas id="pdf" :ref="el => initCanvas(el, doc)" style="width: 100%; height: 155px;"></canvas> -->
                 <div class="ms" v-if="doc.parse">
                   解析进度：{{ doc.parseProgress }}%
                 </div>

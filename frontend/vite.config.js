@@ -33,6 +33,7 @@ export default defineConfig({
       },
     },
     host:true,
+    open: true,
   },
    optimizeDeps: {
     include: [
