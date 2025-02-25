@@ -12,7 +12,7 @@ const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     // 修改为内网服务器绝对路径（示例路径，请根据实际服务器目录修改）
     // const uploadPath = '/data/uploads/pdf'; // 替换为实际的服务器存储路径
-    const uploadPath = path.join(__dirname, '../../frontend/uploads/pdf');
+    const uploadPath = path.join(__dirname, '../../../frontend/uploads/pdf');
 
     // 自动创建目录
     fs.mkdirSync(uploadPath, { recursive: true });
