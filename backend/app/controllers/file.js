@@ -7,6 +7,26 @@ const path = require('path');
 const { v4: uuidv4 } = require('uuid');
 const fs = require('fs');
 
+const os = require('os');
+const serverIP = getIPAddress();
+
+// 获取内网ip
+function getIPAddress() {
+  let IPAddress = '';
+  var interfaces = os.networkInterfaces();
+  for (var devName in interfaces) {
+    var iface = interfaces[devName];
+    for (var i = 0; i < iface.length; i++) {
+      var alias = iface[i];
+      if (alias.family === 'IPv4' && alias.address !== '127.0.0.1' && !alias.internal) {
+        IPAddress = alias.address;
+      }
+    }
+  }
+  return IPAddress;
+}
+
+
 // 配置multer存储
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -127,15 +147,9 @@ exports.upload = [
         .replace(/[^a-zA-Z0-9\u4e00-\u9fa5\-_.]/g, '');
 
       // 生成完整URL路径
-            // 如果使用独立域名或端口，可以改为：
-      // const domain = 'http://192.168.30.23:7777'; // 替换为实际内网地址
-      // const domain = `${req.protocol}://${req.get('host')}`;
-      const domain="http://loaclhost:5173"
+      const domain = `${req.protocol}://${getIPAddress()}:5173`;
       // 在生成URL的部分需要同步修改：
       const filePath = `/uploads/pdf/${req.file.filename}`;
-      // const filePath = `/data/uploads/pdf/${req.file.filename}`;
-
-
 
       const fileInfo = {
         file_name: cleanFileName,
