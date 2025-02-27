@@ -428,6 +428,22 @@
   }
 }
 
+.pdf-preview-container {
+  position: relative;
+  min-height: 600px;
+}
+
+.pdf-canvas {
+  width: 100%;
+  border: 1px solid #ebeef5;
+  margin-bottom: 20px;
+}
+
+.pdf-pagination {
+  text-align: center;
+  margin-top: 20px;
+}
+
 :deep(.el-tabs__item) {
  font-size: 25px; 
  height: 70px;

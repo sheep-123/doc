@@ -59,9 +59,9 @@
         <el-row :gutter="20">
           <!-- Add New 按钮 -->
           <el-col :span="100">
-            <el-upload action="file/upload" :data="uploadData" :before-upload="beforeUpload" :on-success="handleSuccess"
-              :on-progress="handleProgress" :on-error="handleError" accept=".pdf" :show-file-list="false"
-              :multiple="true" :disabled="isMemoryProcessing" drag class="upload-card">
+            <el-upload action="/api/file/upload" :data="uploadData" :before-upload="beforeUpload"
+              :on-success="handleSuccess" :on-progress="handleProgress" :on-error="handleError" accept=".pdf"
+              :show-file-list="false" :multiple="true" :disabled="isMemoryProcessing" drag class="upload-card">
               <el-card class="add-el-card" :style="{ width: '240px', height: '240px' }"
                 :class="{ uploading: loading, disabled: isMemoryProcessing }">
                 <el-icon>
@@ -193,9 +193,9 @@
         <el-row :gutter="20">
           <!-- Add New 按钮 -->
           <el-col :span="100">
-            <el-upload action="file/upload" :data="uploadData" :before-upload="beforeUpload" :on-success="handleSuccess"
-              :on-progress="handleProgress" :on-error="handleError" accept=".pdf" :show-file-list="false"
-              :multiple="true" :disabled="isMemoryProcessing" drag class="upload-card">
+            <el-upload action="api/file/upload" :data="uploadData" :before-upload="beforeUpload"
+              :on-success="handleSuccess" :on-progress="handleProgress" :on-error="handleError" accept=".pdf"
+              :show-file-list="false" :multiple="true" :disabled="isMemoryProcessing" drag class="upload-card">
               <el-card class="add-el-card" :style="{ width: '240px', height: '240px' }"
                 :class="{ uploading: loading, disabled: isMemoryProcessing }">
                 <el-icon>
@@ -325,9 +325,9 @@
         <el-row :gutter="20">
           <!-- Add New 按钮 -->
           <el-col :span="100">
-            <el-upload action="file/upload" :data="uploadData" :before-upload="beforeUpload" :on-success="handleSuccess"
-              :on-progress="handleProgress" :on-error="handleError" accept=".pdf" :show-file-list="false"
-              :multiple="true" :disabled="isMemoryProcessing" drag class="upload-card">
+            <el-upload action="/api/file/upload" :data="uploadData" :before-upload="beforeUpload"
+              :on-success="handleSuccess" :on-progress="handleProgress" :on-error="handleError" accept=".pdf"
+              :show-file-list="false" :multiple="true" :disabled="isMemoryProcessing" drag class="upload-card">
               <el-card class="add-el-card" :style="{ width: '240px', height: '240px' }"
                 :class="{ uploading: loading, disabled: isMemoryProcessing }">
                 <el-icon>
@@ -460,9 +460,9 @@
         <el-row :gutter="20">
           <!-- Add New 按钮 -->
           <el-col :span="100">
-            <el-upload action="file/upload" :data="uploadData" :before-upload="beforeUpload" :on-success="handleSuccess"
-              :on-progress="handleProgress" :on-error="handleError" accept=".pdf" :show-file-list="false"
-              :multiple="true" :disabled="isMemoryProcessing" drag class="upload-card">
+            <el-upload action="/api/file/upload" :data="uploadData" :before-upload="beforeUpload"
+              :on-success="handleSuccess" :on-progress="handleProgress" :on-error="handleError" accept=".pdf"
+              :show-file-list="false" :multiple="true" :disabled="isMemoryProcessing" drag class="upload-card">
               <el-card class="add-el-card" :style="{ width: '240px', height: '240px' }"
                 :class="{ uploading: loading, disabled: isMemoryProcessing }">
                 <el-icon>
@@ -593,7 +593,7 @@
         <el-row :gutter="20">
           <!-- Add New 按钮 -->
           <el-col :span="100">
-            <el-upload action="/file/upload" :data="uploadData" :before-upload="beforeUpload"
+            <el-upload action="/api/file/upload" :data="uploadData" :before-upload="beforeUpload"
               :on-success="handleSuccess" :on-progress="handleProgress" :on-error="handleError" accept=".pdf"
               :show-file-list="false" :multiple="true" :disabled="isMemoryProcessing" drag class="upload-card">
               <el-card class="add-el-card" :style="{ width: '240px', height: '240px' }"
@@ -726,9 +726,9 @@
         <el-row :gutter="20">
           <!-- Add New 按钮 -->
           <el-col :span="100">
-            <el-upload action="file/upload" :data="uploadData" :before-upload="beforeUpload" :on-success="handleSuccess"
-              :on-progress="handleProgress" :on-error="handleError" accept=".pdf" :show-file-list="false"
-              :multiple="true" :disabled="isMemoryProcessing" drag class="upload-card">
+            <el-upload action="/api/file/upload" :data="uploadData" :before-upload="beforeUpload"
+              :on-success="handleSuccess" :on-progress="handleProgress" :on-error="handleError" accept=".pdf"
+              :show-file-list="false" :multiple="true" :disabled="isMemoryProcessing" drag class="upload-card">
               <el-card class="add-el-card" :style="{ width: '240px', height: '240px' }"
                 :class="{ uploading: loading, disabled: isMemoryProcessing }">
                 <el-icon>
@@ -859,7 +859,7 @@
         <el-row :gutter="20">
           <!-- Add New 按钮 -->
           <el-col :span="100">
-            <el-upload action="/file/upload" :data="uploadData" :before-upload="beforeUpload"
+            <el-upload action="/api/file/upload" :data="uploadData" :before-upload="beforeUpload"
               :on-success="handleSuccess" :on-progress="handleProgress" :on-error="handleError" accept=".pdf"
               :show-file-list="false" :multiple="true" :disabled="isMemoryProcessing" drag class="upload-card">
               <el-card class="add-el-card" :style="{ width: '240px', height: '240px' }"
@@ -992,7 +992,7 @@
         <el-row :gutter="20">
           <!-- Add New 按钮 -->
           <el-col :span="100">
-            <el-upload action="/file/upload" :data="uploadData" :before-upload="beforeUpload"
+            <el-upload action="/api/file/upload" :data="uploadData" :before-upload="beforeUpload"
               :on-success="handleSuccess" :on-progress="handleProgress" :on-error="handleError" accept=".pdf"
               :show-file-list="false" :multiple="true" :disabled="isMemoryProcessing" drag class="upload-card">
               <el-card class="add-el-card" :style="{ width: '240px', height: '240px' }"
@@ -1161,7 +1161,7 @@ onMounted(() => {
   getFileList();
   getTagList();
   getQuerySearch();
-  connectWebsocket();
+  // connectWebsocket();
   getPolicyList();
   getOfficialList();
   getReportList();
@@ -1175,17 +1175,17 @@ onMounted(() => {
 const page = ref(1);
 const num = ref(23);
 
-const maxPage = ref(0);//法律法规
-const maxPolicyPage = ref(0);//政策解读
-const maxHandlePage = ref(0);//用户手册
-const maxScriptPage = ref(0);//数据库脚本
-const maxOfficialPage = ref(0);//公文
-const maxRepositoryPage = ref(0);//运维知识库
-const maxReportPage = ref(0);//调研报告
-const maxBookPage = ref(0);//图书
+const maxPage = ref(1);//法律法规
+const maxPolicyPage = ref(1);//政策解读
+const maxHandlePage = ref(1);//用户手册
+const maxScriptPage = ref(1);//数据库脚本
+const maxOfficialPage = ref(1);//公文
+const maxRepositoryPage = ref(1);//运维知识库
+const maxReportPage = ref(1);//调研报告
+const maxBookPage = ref(1);//图书
 
 const totalFiles = ref(0);
-const circleUrl = ref('https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png');
+const circleUrl = ref('/assets/images/avatar.png');
 const activeName = ref('law')
 
 const documents = ref([]);//法律法规
@@ -1262,6 +1262,7 @@ const getQuerySearch = async () => {
     });
   }
 };
+
 
 
 const totalPolicy = ref(0)
@@ -1583,7 +1584,7 @@ const handleSuccess = async (response, uploadFile) => {
     if (targetDoc) {
       // 关闭上传状态，开启解析状态
       targetDoc.docURL = response.data.url;
-      targetDoc.id=response.data.id;
+      targetDoc.id = response.data.id;
       setTimeout(() => {
         targetDoc.isUploaded = false;
       }, 500)
@@ -1591,15 +1592,14 @@ const handleSuccess = async (response, uploadFile) => {
     }
   }
 
+  return
+
   // 发送消息前检查连接状态
   if (ws.value?.readyState !== WebSocket.OPEN) {
     // ElMessage.warning('websocket连接未就绪');
     console.log("websocket连接未就绪");
     return;
   }
-
-  console.log(response);
-
 
   // 获取上传文件对象
   const file = uploadFile.raw;
@@ -1609,7 +1609,8 @@ const handleSuccess = async (response, uploadFile) => {
   addToParseQueue({
     id: response.data.id,
     file: uploadFile.raw,
-    base64Data
+    base64Data,
+    type: activeName.value
   });
 }
 
@@ -1681,7 +1682,7 @@ const startNextParse = () => {
     });
   } else {
     // 新增：当找不到文档时自动清理队列
-    parseQueue.value.shift();  
+    parseQueue.value.shift();
     isParsing.value = false;
     startNextParse();
   }
@@ -1961,7 +1962,7 @@ const truncateFileName = (name, maxLength) => {
 };
 
 const logout = () => {
-  proxy.$router.push('/login');
+  proxy.$router.push('/');
 }
 
 const handleClick = (tab, event) => {
@@ -2006,7 +2007,7 @@ onUnmounted(() => {
 // 添加预览相关状态
 const previewVisible = ref(false)
 const previewLoading = ref(false)
-const pdfPage = ref(null)
+
 const currentPage = ref(1)
 const totalPages = ref(0)
 let pdfDoc = null
@@ -2015,20 +2016,4 @@ let pdfDoc = null
 
 <style scoped>
 @import url('/assets/css/file.css');
-
-.pdf-preview-container {
-  position: relative;
-  min-height: 600px;
-}
-
-.pdf-canvas {
-  width: 100%;
-  border: 1px solid #ebeef5;
-  margin-bottom: 20px;
-}
-
-.pdf-pagination {
-  text-align: center;
-  margin-top: 20px;
-}
 </style>

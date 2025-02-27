@@ -1,35 +1,36 @@
 module.exports = (app) => {
   const file = require('../controllers/file');
+  const auth = require('../middleware/auth');
 
   var router = require('express').Router();
 
-  router.get('/getfilelist', file.getFileList);
+  router.get('/getfilelist', auth.verifyToken, file.getFileList);
 
   router.post('/upload', file.upload);
 
-  router.post('/gettaglist', file.getTagList);
+  router.post('/gettaglist', auth.verifyToken, file.getTagList);
 
-  router.post('/getquerysearch', file.getQuerySearch);
+  router.post('/getquerysearch', auth.verifyToken, file.getQuerySearch);
 
-  router.get('/memory', file.updateMemoryStatus);
+  router.get('/memory', auth.verifyToken, file.updateMemoryStatus);
 
-  router.post('/edittag', file.updateFileTag);
+  router.post('/edittag', auth.verifyToken, file.updateFileTag);
 
-  router.get('/deletefile', file.deleteFile);
+  router.get('/deletefile', auth.verifyToken, file.deleteFile);
 
-  router.get('/getpolicy', file.getPolicy);
+  router.get('/getpolicy', auth.verifyToken, file.getPolicy);
 
-  router.get('/getofficial', file.getOfficial);
+  router.get('/getofficial', auth.verifyToken, file.getOfficial);
 
-  router.get('/getbook', file.getBook);
+  router.get('/getbook', auth.verifyToken, file.getBook);
 
-  router.get('/gethandlebook', file.getHandleBook);
+  router.get('/gethandlebook', auth.verifyToken, file.getHandleBook);
 
-  router.get('/getreport', file.getReport);
+  router.get('/getreport', auth.verifyToken, file.getReport);
 
-  router.get('/getrepository', file.getRepository);
+  router.get('/getrepository', auth.verifyToken, file.getRepository);
 
-  router.get('/getscript', file.getScript);
+  router.get('/getscript', auth.verifyToken, file.getScript);
 
   app.use('/file', router);
 };

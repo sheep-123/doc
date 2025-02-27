@@ -50,6 +50,7 @@ app.get('/', (req, res) => {
 //require("./app/routes/turorial.routes")(app);
 // 业务路由
 require('./app/routes/file')(app);
+require('./app/routes/user')(app);
 
 // 创建上传目录
 const uploadDir = path.join(__dirname, 'app/uploads');
@@ -58,16 +59,14 @@ if (!fs.existsSync(uploadDir)) {
 }
 
 // 配置静态资源访问
-// app.use('/uploads', express.static(uploadDir));
-app.use('/uploads', express.static('/data/uploads')); // 内网保存路径
+app.use('/uploads', express.static(uploadDir));
+
 
 // set port, listen for requests
 // 环境变量优先，默认
 const PORT = process.env.PORT || 7777;
-// app.listen(PORT, () => {
-//   console.log(`Server is running on port ${PORT}.`);
-// });
-
-app.listen(PORT, '0.0.0.0', () => {
+app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}.`);
 });
+
+

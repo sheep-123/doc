@@ -37,7 +37,7 @@ const loginForm = reactive({
 
 const loginRules = reactive({
     username: [
-        { required: true, message: '账号不能为空', trigger: 'blur' }
+        { required: true, message: '用户名不能为空', trigger: 'blur' }
     ],
     password: [
         { required: true, message: '密码不能为空', trigger: 'blur' }
@@ -48,16 +48,37 @@ const loading = ref(false)
 const loginFormRef = ref(null)
 
 const handleLogin = () => {
-    loginFormRef.value.validate(valid => {
+    loginFormRef.value.validate(async (valid) => {
         if (!valid) return
 
         loading.value = true
-        // 模拟登录请求
-        setTimeout(() => {
+        var result = await proxy.$POST({
+            url: '/user/login',
+            params: loginForm
+        })
+
+        if (result.code === 0) {
             loading.value = false
-            ElMessage.success('登录成功')
-            proxy.$router.push('/')
-        }, 1000)
+            ElMessage.error(result.msg);
+            return;
+        }
+
+        else if (result.code === 1) {
+            loading.value = false
+            ElMessage.success(result.msg)
+            // return
+            setTimeout(() => {
+                proxy.$token.value = result.data.token;
+                proxy.$user.value = result.data.user;
+                // proxy.$router.push('/file')
+                if (result.data.status === "repassword") {
+                    proxy.$router.push('/repassword')
+                } else if (result.data.status === "success") {
+                    const url = `http://192.168.30.23:7860?token=${proxy.$token.value}`;
+                    window.location.href = url;
+                }
+            }, 1000);
+        }
     })
 }
 </script>

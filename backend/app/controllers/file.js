@@ -1,14 +1,11 @@
 const db = require('../models');
 const File = db.file;
 const Op = db.Sequelize.Op;
-
 const multer = require('multer');
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
 const fs = require('fs');
-
 const os = require('os');
-const serverIP = getIPAddress();
 
 // 获取内网ip
 function getIPAddress() {
@@ -18,7 +15,11 @@ function getIPAddress() {
     var iface = interfaces[devName];
     for (var i = 0; i < iface.length; i++) {
       var alias = iface[i];
-      if (alias.family === 'IPv4' && alias.address !== '127.0.0.1' && !alias.internal) {
+      if (
+        alias.family === 'IPv4' &&
+        alias.address !== '127.0.0.1' &&
+        !alias.internal
+      ) {
         IPAddress = alias.address;
       }
     }
@@ -26,12 +27,9 @@ function getIPAddress() {
   return IPAddress;
 }
 
-
 // 配置multer存储
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    // 修改为内网服务器绝对路径（示例路径，请根据实际服务器目录修改）
-    // const uploadPath = '/data/uploads/pdf'; // 替换为实际的服务器存储路径
     const uploadPath = path.join(__dirname, '../../../frontend/uploads/pdf');
 
     // 自动创建目录
@@ -43,7 +41,7 @@ const storage = multer.diskStorage({
     cb(null, `${uuidv4()}${ext}`);
   }
 });
-
+// 文件上传校验
 const upload = multer({
   storage,
   limits: { fileSize: 50 * 1024 * 1024 },
@@ -124,8 +122,6 @@ exports.upload = [
           data: null
         });
       }
-
-      // const { type } = req.query; // 获取前端传递的type参数
 
       const { type } = req.body; // 获取前端传递的type参数
       if (!type) {
@@ -239,15 +235,6 @@ exports.getTagList = async (req, res) => {
 
 exports.getQuerySearch = async (req, res) => {
   try {
-    // 验证请求方法
-    if (req.method !== 'POST') {
-      return res.status(405).json({
-        code: 0,
-        msg: '仅支持POST请求方法',
-        data: null
-      });
-    }
-
     // 查询数据库获取所有文件名
     const files = await File.findAll({
       attributes: ['file_name'],
