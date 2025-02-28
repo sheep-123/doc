@@ -1,10 +1,10 @@
 
-/backend/node_modules/
-/frontend/node_modules/
-/frontend/dist/
+/backend/node_modules
+/frontend/node_modules
+/frontend/dist
 /backend/app/uploads/*
 /frontend/dist/.vscode
-/backend/package-lock.json/
-/backend/README.md/
-/frontend/README.md/
-/fontend/package-lock.json/
+/backend/package-lock.json
+/backend/README.md
+/frontend/README.md
+/fontend/package-lock.json

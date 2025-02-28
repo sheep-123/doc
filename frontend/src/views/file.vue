@@ -2,7 +2,7 @@
   <!-- 导航栏 -->
   <div class="nav">
     <div class="nav-left">
-      <div style="width:30px;height:30px;margin-top: 5px;">
+      <div style="width: 30px; height: 30px; margin-top: 5px">
         <svg viewBox="0 0 24 24" fill="currentColor">
           <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"></path>
         </svg>
@@ -13,11 +13,32 @@
 
     <div class="nav-right">
       <div class="left">
-        <el-autocomplete v-model="searchQuery" :fetch-suggestions="querySearch" clearable class="inline-input w-50"
-          placeholder="请输入文档名字" @select="handleSelect" :trigger-on-focus="false" style="width: 300px;" />
+        <el-autocomplete
+          v-model="searchQuery"
+          :fetch-suggestions="querySearch"
+          clearable
+          class="inline-input w-50"
+          placeholder="请输入文档名字"
+          @select="handleSelect"
+          :trigger-on-focus="false"
+          style="width: 300px"
+        />
 
-        <el-button type="primary" icon="Search" @click="searchDocuments" style="margin-left: 10px;">搜索</el-button>
-        <el-button type="info" icon="Refresh" @click="resetAll" plain style="color: black">重置</el-button>
+        <el-button
+          type="primary"
+          icon="Search"
+          @click="searchDocuments"
+          style="margin-left: 10px"
+          >搜索</el-button
+        >
+        <el-button
+          type="info"
+          icon="Refresh"
+          @click="resetAll"
+          plain
+          style="color: black"
+          >重置</el-button
+        >
       </div>
 
       <el-dropdown>
@@ -30,7 +51,6 @@
           </el-dropdown-menu>
         </template>
       </el-dropdown>
-
     </div>
   </div>
 
@@ -39,16 +59,22 @@
     <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick">
       <el-tab-pane name="law">
         <template #label>
-          <div :class="{ 'highlight': showHighlight.law }">
+          <div :class="{ highlight: showHighlight.law }">
             <div class="main-title">法律法规</div>
             <div class="sub-title">({{ totalFiles }})</div>
           </div>
         </template>
         <!-- 二级标签 -->
 
-        <el-row :gutter="20" style="margin-left: 5px;margin-bottom: 10px;">
-          <el-check-tag v-for="tag in tags" :key="tag" :checked="selectedTagsMap[tag]" class="multi-tag"
-            :type="selectedTagsMap[tag] ? 'success' : 'info'" @change="handleTagChange(tag)">
+        <el-row :gutter="20" style="margin-left: 5px; margin-bottom: 10px">
+          <el-check-tag
+            v-for="tag in tags"
+            :key="tag"
+            :checked="selectedTagsMap[tag]"
+            class="multi-tag"
+            :type="selectedTagsMap[tag] ? 'success' : 'info'"
+            @change="handleTagChange(tag)"
+          >
             {{ tag }}
             <el-icon v-if="selectedTagsMap[tag]">
               <Select />
@@ -59,11 +85,25 @@
         <el-row :gutter="20">
           <!-- Add New 按钮 -->
           <el-col :span="100">
-            <el-upload action="/api/file/upload" :data="uploadData" :before-upload="beforeUpload"
-              :on-success="handleSuccess" :on-progress="handleProgress" :on-error="handleError" accept=".pdf"
-              :show-file-list="false" :multiple="true" :disabled="isMemoryProcessing" drag class="upload-card">
-              <el-card class="add-el-card" :style="{ width: '240px', height: '240px' }"
-                :class="{ uploading: loading, disabled: isMemoryProcessing }">
+            <el-upload
+              action="/api/file/upload"
+              :data="uploadData"
+              :before-upload="beforeUpload"
+              :on-success="handleSuccess"
+              :on-progress="handleProgress"
+              :on-error="handleError"
+              accept=".pdf"
+              :show-file-list="false"
+              :multiple="true"
+              :disabled="isMemoryProcessing"
+              drag
+              class="upload-card"
+            >
+              <el-card
+                class="add-el-card"
+                :style="{ width: '240px', height: '240px' }"
+                :class="{ uploading: loading, disabled: isMemoryProcessing }"
+              >
                 <el-icon>
                   <Plus />
                 </el-icon>
@@ -89,18 +129,49 @@
               <!-- 添加编辑图标和输入框 -->
               <div class="tab-edit">
                 <template v-if="!doc.tags && !doc.isEditing">
-                  <el-button type="info" plain icon="Edit" @click="editTag(doc)" style="color: black">未定义标签</el-button>
+                  <el-button
+                    type="info"
+                    plain
+                    icon="Edit"
+                    @click="editTag(doc)"
+                    style="color: black"
+                    >未定义标签</el-button
+                  >
                 </template>
                 <template v-else-if="!doc.isEditing">
-                  <el-button type="info" plain icon="Edit" @click="editTag(doc)" style="color: black">{{ doc.tags
-                  }}</el-button>
+                  <el-button
+                    type="info"
+                    plain
+                    icon="Edit"
+                    @click="editTag(doc)"
+                    style="color: black"
+                    >{{ doc.tags }}</el-button
+                  >
                 </template>
                 <template v-if="doc.isEditing">
-                  <el-input v-model="doc.tags" @blur="saveTag(doc)" @keyup.enter="saveTag(doc)" ref="tagText"
-                    style="width: 100px" :autofocus="true" />
+                  <el-input
+                    v-model="doc.tags"
+                    @blur="saveTag(doc)"
+                    @keyup.enter="saveTag(doc)"
+                    ref="tagText"
+                    style="width: 100px"
+                    :autofocus="true"
+                  />
                   <div class="button">
-                    <el-button type="info" @click="saveTag(doc)" plain style="color: black">√</el-button>
-                    <el-button type="info" @click="cancelEdit(doc)" plain style="color: black">x</el-button>
+                    <el-button
+                      type="info"
+                      @click="saveTag(doc)"
+                      plain
+                      style="color: black"
+                      >√</el-button
+                    >
+                    <el-button
+                      type="info"
+                      @click="cancelEdit(doc)"
+                      plain
+                      style="color: black"
+                      >x</el-button
+                    >
                   </div>
                 </template>
               </div>
@@ -143,10 +214,17 @@
               <!-- 毛玻璃上传中-->
               <div v-if="doc.isUploaded" class="glass-overlay">
                 <div class="progress-info">
-                  <el-progress :percentage="doc.uploadProgress" status="success" class="upload-progress"
-                    stroke-linecap="square" type="dashboard">
+                  <el-progress
+                    :percentage="doc.uploadProgress"
+                    status="success"
+                    class="upload-progress"
+                    stroke-linecap="square"
+                    type="dashboard"
+                  >
                     <template #default="scoped">
-                      <span class="percentage-value">上传进度:{{ doc.uploadProgress }}%</span>
+                      <span class="percentage-value"
+                        >上传进度:{{ doc.uploadProgress }}%</span
+                      >
                     </template>
                   </el-progress>
                 </div>
@@ -159,7 +237,10 @@
               </div>
 
               <!-- 添加全局蒙层 -->
-              <div v-if="isMemoryProcessing && !doc.isProcessing" class="glass-overlay memory-processing">
+              <div
+                v-if="isMemoryProcessing && !doc.isProcessing"
+                class="glass-overlay memory-processing"
+              >
                 <div class="progress-info">
                   <div class="progress-text">
                     <el-icon>
@@ -178,14 +259,18 @@
 
         <!-- 分页 -->
         <div class="page">
-          <el-pagination layout="prev, pager, next" :total="1000" :page-size="num" @current-change="pageChange"
-            :page-count="maxPage" />
+          <el-pagination
+            layout="prev, pager, next"
+            :total="1000"
+            :page-size="num"
+            @current-change="pageChange"
+            :page-count="maxPage"
+          />
         </div>
-
       </el-tab-pane>
       <el-tab-pane name="policy">
         <template #label>
-          <div :class="{ 'highlight': showHighlight.policy }">
+          <div :class="{ highlight: showHighlight.policy }">
             <div class="main-title">政策解读</div>
             <div class="sub-title">({{ totalPolicy }})</div>
           </div>
@@ -193,11 +278,25 @@
         <el-row :gutter="20">
           <!-- Add New 按钮 -->
           <el-col :span="100">
-            <el-upload action="api/file/upload" :data="uploadData" :before-upload="beforeUpload"
-              :on-success="handleSuccess" :on-progress="handleProgress" :on-error="handleError" accept=".pdf"
-              :show-file-list="false" :multiple="true" :disabled="isMemoryProcessing" drag class="upload-card">
-              <el-card class="add-el-card" :style="{ width: '240px', height: '240px' }"
-                :class="{ uploading: loading, disabled: isMemoryProcessing }">
+            <el-upload
+              action="api/file/upload"
+              :data="uploadData"
+              :before-upload="beforeUpload"
+              :on-success="handleSuccess"
+              :on-progress="handleProgress"
+              :on-error="handleError"
+              accept=".pdf"
+              :show-file-list="false"
+              :multiple="true"
+              :disabled="isMemoryProcessing"
+              drag
+              class="upload-card"
+            >
+              <el-card
+                class="add-el-card"
+                :style="{ width: '240px', height: '240px' }"
+                :class="{ uploading: loading, disabled: isMemoryProcessing }"
+              >
                 <el-icon>
                   <Plus />
                 </el-icon>
@@ -223,18 +322,49 @@
               <!-- 添加编辑图标和输入框 -->
               <div class="tab-edit">
                 <template v-if="!doc.tags && !doc.isEditing">
-                  <el-button type="info" plain icon="Edit" @click="editTag(doc)" style="color: black">未定义标签</el-button>
+                  <el-button
+                    type="info"
+                    plain
+                    icon="Edit"
+                    @click="editTag(doc)"
+                    style="color: black"
+                    >未定义标签</el-button
+                  >
                 </template>
                 <template v-else-if="!doc.isEditing">
-                  <el-button type="info" plain icon="Edit" @click="editTag(doc)" style="color: black">{{ doc.tags
-                  }}</el-button>
+                  <el-button
+                    type="info"
+                    plain
+                    icon="Edit"
+                    @click="editTag(doc)"
+                    style="color: black"
+                    >{{ doc.tags }}</el-button
+                  >
                 </template>
                 <template v-if="doc.isEditing">
-                  <el-input v-model="doc.tags" @blur="saveTag(doc)" @keyup.enter="saveTag(doc)" ref="tagText"
-                    style="width: 100px" :autofocus="true" />
+                  <el-input
+                    v-model="doc.tags"
+                    @blur="saveTag(doc)"
+                    @keyup.enter="saveTag(doc)"
+                    ref="tagText"
+                    style="width: 100px"
+                    :autofocus="true"
+                  />
                   <div class="button">
-                    <el-button type="info" @click="saveTag(doc)" plain style="color: black">√</el-button>
-                    <el-button type="info" @click="cancelEdit(doc)" plain style="color: black">x</el-button>
+                    <el-button
+                      type="info"
+                      @click="saveTag(doc)"
+                      plain
+                      style="color: black"
+                      >√</el-button
+                    >
+                    <el-button
+                      type="info"
+                      @click="cancelEdit(doc)"
+                      plain
+                      style="color: black"
+                      >x</el-button
+                    >
                   </div>
                 </template>
               </div>
@@ -277,10 +407,17 @@
               <!-- 毛玻璃上传中-->
               <div v-if="doc.isUploaded" class="glass-overlay">
                 <div class="progress-info">
-                  <el-progress :percentage="doc.uploadProgress" status="success" class="upload-progress"
-                    stroke-linecap="square" type="dashboard">
+                  <el-progress
+                    :percentage="doc.uploadProgress"
+                    status="success"
+                    class="upload-progress"
+                    stroke-linecap="square"
+                    type="dashboard"
+                  >
                     <template #default="scoped">
-                      <span class="percentage-value">上传进度:{{ doc.uploadProgress }}%</span>
+                      <span class="percentage-value"
+                        >上传进度:{{ doc.uploadProgress }}%</span
+                      >
                     </template>
                   </el-progress>
                 </div>
@@ -293,7 +430,10 @@
               </div>
 
               <!-- 添加全局蒙层 -->
-              <div v-if="isMemoryProcessing && !doc.isProcessing" class="glass-overlay memory-processing">
+              <div
+                v-if="isMemoryProcessing && !doc.isProcessing"
+                class="glass-overlay memory-processing"
+              >
                 <div class="progress-info">
                   <div class="progress-text">
                     <el-icon>
@@ -311,11 +451,16 @@
         </el-row>
         <!-- 分页 -->
         <div class="page">
-          <el-pagination layout="prev, pager, next" :total="1000" :page-size="num" @current-change="pageChange"
-            :page-count="maxPolicyPage" />
+          <el-pagination
+            layout="prev, pager, next"
+            :total="1000"
+            :page-size="num"
+            @current-change="pageChange"
+            :page-count="maxPolicyPage"
+          />
         </div>
       </el-tab-pane>
-      <el-tab-pane name="official">
+      <!-- <el-tab-pane name="official">
         <template #label>
           <div :class="{ 'highlight': showHighlight.official }">
             <div class="main-title">公文</div>
@@ -323,7 +468,7 @@
           </div>
         </template>
         <el-row :gutter="20">
-          <!-- Add New 按钮 -->
+   
           <el-col :span="100">
             <el-upload action="/api/file/upload" :data="uploadData" :before-upload="beforeUpload"
               :on-success="handleSuccess" :on-progress="handleProgress" :on-error="handleError" accept=".pdf"
@@ -335,7 +480,6 @@
                 </el-icon>
                 <p>添加PDF文档</p>
 
-                <!-- 添加上传按钮的蒙层 -->
                 <div v-if="isMemoryProcessing" class="glass-overlay new-ms">
                   <div class="progress-info">
                     <div class="progress-text">
@@ -349,10 +493,9 @@
             </el-upload>
           </el-col>
 
-          <!-- 文档卡片 -->
           <el-col :span="100" v-for="(doc, index) in official" :key="index">
             <el-card :style="{ width: '240px', height: '240px' }">
-              <!-- 添加编辑图标和输入框 -->
+             
               <div class="tab-edit">
                 <template v-if="!doc.tags && !doc.isEditing">
                   <el-button type="info" plain icon="Edit" @click="editTag(doc)" style="color: black">未定义标签</el-button>
@@ -370,43 +513,21 @@
                   </div>
                 </template>
               </div>
-              <!-- 标题 -->
+             
               <div slot="header" class="title">
                 <el-tooltip :content="doc.title" placement="top">
                   <span>{{ truncateFileName(doc.title, 9) }}</span>
                 </el-tooltip>
               </div>
-              <!-- 解析 -->
+             
               <div class="content">
                 <embed :src="doc.docURL" class="doc-preview" />
-                <!-- <canvas id="pdf" :ref="el => initCanvas(el, doc)" style="width: 100%; height: 180px;"></canvas> -->
+                
                 <div class="ms" v-if="doc.parse">
                   解析进度：{{ doc.parseProgress }}%
                 </div>
               </div>
 
-              <!-- 倒立梯形标签 -->
-              <!-- <div
-          class="status-label-container"
-          @click="deepMemory(doc)"
-          :data-memory="doc.isMemory"
-          :class="{ disabled: isMemoryProcessing && !doc.isProcessing }"
-        >
-          <svg
-            class="status-label-svg"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 100 40"
-            preserveAspectRatio="none"
-          >
-            <path
-              d="M0 0 L100 0 L100 40 L20 40 Z"
-              class="status-label-path"
-            ></path>
-          </svg>
-          <span class="status-label-text">{{ doc.status }}</span>
-        </div> -->
-
-              <!-- 毛玻璃上传中-->
               <div v-if="doc.isUploaded" class="glass-overlay">
                 <div class="progress-info">
                   <el-progress :percentage="doc.uploadProgress" status="success" class="upload-progress"
@@ -417,14 +538,13 @@
                   </el-progress>
                 </div>
               </div>
-              <!-- 深度记忆中 -->
+
               <div v-if="doc.isProcessing" class="glass-overlay">
                 <div class="progress-info">
                   <div class="progress-text">深度记忆中{{ doc.progress }}%</div>
                 </div>
               </div>
 
-              <!-- 添加全局蒙层 -->
               <div v-if="isMemoryProcessing && !doc.isProcessing" class="glass-overlay memory-processing">
                 <div class="progress-info">
                   <div class="progress-text">
@@ -442,17 +562,16 @@
           </el-col>
         </el-row>
 
-        <!-- 分页 -->
         <div class="page">
           <el-pagination layout="prev, pager, next" :total="1000" :page-size="num" @current-change="pageChange"
             :page-count="maxOfficialPage" />
         </div>
 
 
-      </el-tab-pane>
+      </el-tab-pane> -->
       <el-tab-pane name="report">
         <template #label>
-          <div :class="{ 'highlight': showHighlight.report }">
+          <div :class="{ highlight: showHighlight.report }">
             <div class="main-title">调研报告</div>
             <div class="sub-title">({{ totalReport }})</div>
           </div>
@@ -460,11 +579,25 @@
         <el-row :gutter="20">
           <!-- Add New 按钮 -->
           <el-col :span="100">
-            <el-upload action="/api/file/upload" :data="uploadData" :before-upload="beforeUpload"
-              :on-success="handleSuccess" :on-progress="handleProgress" :on-error="handleError" accept=".pdf"
-              :show-file-list="false" :multiple="true" :disabled="isMemoryProcessing" drag class="upload-card">
-              <el-card class="add-el-card" :style="{ width: '240px', height: '240px' }"
-                :class="{ uploading: loading, disabled: isMemoryProcessing }">
+            <el-upload
+              action="/api/file/upload"
+              :data="uploadData"
+              :before-upload="beforeUpload"
+              :on-success="handleSuccess"
+              :on-progress="handleProgress"
+              :on-error="handleError"
+              accept=".pdf"
+              :show-file-list="false"
+              :multiple="true"
+              :disabled="isMemoryProcessing"
+              drag
+              class="upload-card"
+            >
+              <el-card
+                class="add-el-card"
+                :style="{ width: '240px', height: '240px' }"
+                :class="{ uploading: loading, disabled: isMemoryProcessing }"
+              >
                 <el-icon>
                   <Plus />
                 </el-icon>
@@ -490,18 +623,49 @@
               <!-- 添加编辑图标和输入框 -->
               <div class="tab-edit">
                 <template v-if="!doc.tags && !doc.isEditing">
-                  <el-button type="info" plain icon="Edit" @click="editTag(doc)" style="color: black">未定义标签</el-button>
+                  <el-button
+                    type="info"
+                    plain
+                    icon="Edit"
+                    @click="editTag(doc)"
+                    style="color: black"
+                    >未定义标签</el-button
+                  >
                 </template>
                 <template v-else-if="!doc.isEditing">
-                  <el-button type="info" plain icon="Edit" @click="editTag(doc)" style="color: black">{{ doc.tags
-                  }}</el-button>
+                  <el-button
+                    type="info"
+                    plain
+                    icon="Edit"
+                    @click="editTag(doc)"
+                    style="color: black"
+                    >{{ doc.tags }}</el-button
+                  >
                 </template>
                 <template v-if="doc.isEditing">
-                  <el-input v-model="doc.tags" @blur="saveTag(doc)" @keyup.enter="saveTag(doc)" ref="tagText"
-                    style="width: 100px" :autofocus="true" />
+                  <el-input
+                    v-model="doc.tags"
+                    @blur="saveTag(doc)"
+                    @keyup.enter="saveTag(doc)"
+                    ref="tagText"
+                    style="width: 100px"
+                    :autofocus="true"
+                  />
                   <div class="button">
-                    <el-button type="info" @click="saveTag(doc)" plain style="color: black">√</el-button>
-                    <el-button type="info" @click="cancelEdit(doc)" plain style="color: black">x</el-button>
+                    <el-button
+                      type="info"
+                      @click="saveTag(doc)"
+                      plain
+                      style="color: black"
+                      >√</el-button
+                    >
+                    <el-button
+                      type="info"
+                      @click="cancelEdit(doc)"
+                      plain
+                      style="color: black"
+                      >x</el-button
+                    >
                   </div>
                 </template>
               </div>
@@ -544,10 +708,17 @@
               <!-- 毛玻璃上传中-->
               <div v-if="doc.isUploaded" class="glass-overlay">
                 <div class="progress-info">
-                  <el-progress :percentage="doc.uploadProgress" status="success" class="upload-progress"
-                    stroke-linecap="square" type="dashboard">
+                  <el-progress
+                    :percentage="doc.uploadProgress"
+                    status="success"
+                    class="upload-progress"
+                    stroke-linecap="square"
+                    type="dashboard"
+                  >
                     <template #default="scoped">
-                      <span class="percentage-value">上传进度:{{ doc.uploadProgress }}%</span>
+                      <span class="percentage-value"
+                        >上传进度:{{ doc.uploadProgress }}%</span
+                      >
                     </template>
                   </el-progress>
                 </div>
@@ -560,7 +731,10 @@
               </div>
 
               <!-- 添加全局蒙层 -->
-              <div v-if="isMemoryProcessing && !doc.isProcessing" class="glass-overlay memory-processing">
+              <div
+                v-if="isMemoryProcessing && !doc.isProcessing"
+                class="glass-overlay memory-processing"
+              >
                 <div class="progress-info">
                   <div class="progress-text">
                     <el-icon>
@@ -578,13 +752,18 @@
         </el-row>
         <!-- 分页 -->
         <div class="page">
-          <el-pagination layout="prev, pager, next" :total="1000" :page-size="num" @current-change="pageChange"
-            :page-count="maxReportPage" />
+          <el-pagination
+            layout="prev, pager, next"
+            :total="1000"
+            :page-size="num"
+            @current-change="pageChange"
+            :page-count="maxReportPage"
+          />
         </div>
       </el-tab-pane>
       <el-tab-pane name="book">
         <template #label>
-          <div :class="{ 'highlight': showHighlight.book }">
+          <div :class="{ highlight: showHighlight.book }">
             <div class="main-title">指导书</div>
             <div class="sub-title">({{ totalBook }})</div>
           </div>
@@ -593,11 +772,25 @@
         <el-row :gutter="20">
           <!-- Add New 按钮 -->
           <el-col :span="100">
-            <el-upload action="/api/file/upload" :data="uploadData" :before-upload="beforeUpload"
-              :on-success="handleSuccess" :on-progress="handleProgress" :on-error="handleError" accept=".pdf"
-              :show-file-list="false" :multiple="true" :disabled="isMemoryProcessing" drag class="upload-card">
-              <el-card class="add-el-card" :style="{ width: '240px', height: '240px' }"
-                :class="{ uploading: loading, disabled: isMemoryProcessing }">
+            <el-upload
+              action="/api/file/upload"
+              :data="uploadData"
+              :before-upload="beforeUpload"
+              :on-success="handleSuccess"
+              :on-progress="handleProgress"
+              :on-error="handleError"
+              accept=".pdf"
+              :show-file-list="false"
+              :multiple="true"
+              :disabled="isMemoryProcessing"
+              drag
+              class="upload-card"
+            >
+              <el-card
+                class="add-el-card"
+                :style="{ width: '240px', height: '240px' }"
+                :class="{ uploading: loading, disabled: isMemoryProcessing }"
+              >
                 <el-icon>
                   <Plus />
                 </el-icon>
@@ -623,18 +816,49 @@
               <!-- 添加编辑图标和输入框 -->
               <div class="tab-edit">
                 <template v-if="!doc.tags && !doc.isEditing">
-                  <el-button type="info" plain icon="Edit" @click="editTag(doc)" style="color: black">未定义标签</el-button>
+                  <el-button
+                    type="info"
+                    plain
+                    icon="Edit"
+                    @click="editTag(doc)"
+                    style="color: black"
+                    >未定义标签</el-button
+                  >
                 </template>
                 <template v-else-if="!doc.isEditing">
-                  <el-button type="info" plain icon="Edit" @click="editTag(doc)" style="color: black">{{ doc.tags
-                  }}</el-button>
+                  <el-button
+                    type="info"
+                    plain
+                    icon="Edit"
+                    @click="editTag(doc)"
+                    style="color: black"
+                    >{{ doc.tags }}</el-button
+                  >
                 </template>
                 <template v-if="doc.isEditing">
-                  <el-input v-model="doc.tags" @blur="saveTag(doc)" @keyup.enter="saveTag(doc)" ref="tagText"
-                    style="width: 100px" :autofocus="true" />
+                  <el-input
+                    v-model="doc.tags"
+                    @blur="saveTag(doc)"
+                    @keyup.enter="saveTag(doc)"
+                    ref="tagText"
+                    style="width: 100px"
+                    :autofocus="true"
+                  />
                   <div class="button">
-                    <el-button type="info" @click="saveTag(doc)" plain style="color: black">√</el-button>
-                    <el-button type="info" @click="cancelEdit(doc)" plain style="color: black">x</el-button>
+                    <el-button
+                      type="info"
+                      @click="saveTag(doc)"
+                      plain
+                      style="color: black"
+                      >√</el-button
+                    >
+                    <el-button
+                      type="info"
+                      @click="cancelEdit(doc)"
+                      plain
+                      style="color: black"
+                      >x</el-button
+                    >
                   </div>
                 </template>
               </div>
@@ -677,10 +901,17 @@
               <!-- 毛玻璃上传中-->
               <div v-if="doc.isUploaded" class="glass-overlay">
                 <div class="progress-info">
-                  <el-progress :percentage="doc.uploadProgress" status="success" class="upload-progress"
-                    stroke-linecap="square" type="dashboard">
+                  <el-progress
+                    :percentage="doc.uploadProgress"
+                    status="success"
+                    class="upload-progress"
+                    stroke-linecap="square"
+                    type="dashboard"
+                  >
                     <template #default="scoped">
-                      <span class="percentage-value">上传进度:{{ doc.uploadProgress }}%</span>
+                      <span class="percentage-value"
+                        >上传进度:{{ doc.uploadProgress }}%</span
+                      >
                     </template>
                   </el-progress>
                 </div>
@@ -693,7 +924,10 @@
               </div>
 
               <!-- 添加全局蒙层 -->
-              <div v-if="isMemoryProcessing && !doc.isProcessing" class="glass-overlay memory-processing">
+              <div
+                v-if="isMemoryProcessing && !doc.isProcessing"
+                class="glass-overlay memory-processing"
+              >
                 <div class="progress-info">
                   <div class="progress-text">
                     <el-icon>
@@ -712,13 +946,18 @@
 
         <!-- 分页 -->
         <div class="page">
-          <el-pagination layout="prev, pager, next" :total="1000" :page-size="num" @current-change="pageChange"
-            :page-count="maxBookPage" />
+          <el-pagination
+            layout="prev, pager, next"
+            :total="1000"
+            :page-size="num"
+            @current-change="pageChange"
+            :page-count="maxBookPage"
+          />
         </div>
       </el-tab-pane>
       <el-tab-pane name="handlebook">
         <template #label>
-          <div :class="{ 'highlight': showHighlight.handlebook }">
+          <div :class="{ highlight: showHighlight.handlebook }">
             <div class="main-title">用户及操作手册</div>
             <div class="sub-title">({{ totalHandleBook }})</div>
           </div>
@@ -726,11 +965,25 @@
         <el-row :gutter="20">
           <!-- Add New 按钮 -->
           <el-col :span="100">
-            <el-upload action="/api/file/upload" :data="uploadData" :before-upload="beforeUpload"
-              :on-success="handleSuccess" :on-progress="handleProgress" :on-error="handleError" accept=".pdf"
-              :show-file-list="false" :multiple="true" :disabled="isMemoryProcessing" drag class="upload-card">
-              <el-card class="add-el-card" :style="{ width: '240px', height: '240px' }"
-                :class="{ uploading: loading, disabled: isMemoryProcessing }">
+            <el-upload
+              action="/api/file/upload"
+              :data="uploadData"
+              :before-upload="beforeUpload"
+              :on-success="handleSuccess"
+              :on-progress="handleProgress"
+              :on-error="handleError"
+              accept=".pdf"
+              :show-file-list="false"
+              :multiple="true"
+              :disabled="isMemoryProcessing"
+              drag
+              class="upload-card"
+            >
+              <el-card
+                class="add-el-card"
+                :style="{ width: '240px', height: '240px' }"
+                :class="{ uploading: loading, disabled: isMemoryProcessing }"
+              >
                 <el-icon>
                   <Plus />
                 </el-icon>
@@ -756,18 +1009,49 @@
               <!-- 添加编辑图标和输入框 -->
               <div class="tab-edit">
                 <template v-if="!doc.tags && !doc.isEditing">
-                  <el-button type="info" plain icon="Edit" @click="editTag(doc)" style="color: black">未定义标签</el-button>
+                  <el-button
+                    type="info"
+                    plain
+                    icon="Edit"
+                    @click="editTag(doc)"
+                    style="color: black"
+                    >未定义标签</el-button
+                  >
                 </template>
                 <template v-else-if="!doc.isEditing">
-                  <el-button type="info" plain icon="Edit" @click="editTag(doc)" style="color: black">{{ doc.tags
-                  }}</el-button>
+                  <el-button
+                    type="info"
+                    plain
+                    icon="Edit"
+                    @click="editTag(doc)"
+                    style="color: black"
+                    >{{ doc.tags }}</el-button
+                  >
                 </template>
                 <template v-if="doc.isEditing">
-                  <el-input v-model="doc.tags" @blur="saveTag(doc)" @keyup.enter="saveTag(doc)" ref="tagText"
-                    style="width: 100px" :autofocus="true" />
+                  <el-input
+                    v-model="doc.tags"
+                    @blur="saveTag(doc)"
+                    @keyup.enter="saveTag(doc)"
+                    ref="tagText"
+                    style="width: 100px"
+                    :autofocus="true"
+                  />
                   <div class="button">
-                    <el-button type="info" @click="saveTag(doc)" plain style="color: black">√</el-button>
-                    <el-button type="info" @click="cancelEdit(doc)" plain style="color: black">x</el-button>
+                    <el-button
+                      type="info"
+                      @click="saveTag(doc)"
+                      plain
+                      style="color: black"
+                      >√</el-button
+                    >
+                    <el-button
+                      type="info"
+                      @click="cancelEdit(doc)"
+                      plain
+                      style="color: black"
+                      >x</el-button
+                    >
                   </div>
                 </template>
               </div>
@@ -810,10 +1094,17 @@
               <!-- 毛玻璃上传中-->
               <div v-if="doc.isUploaded" class="glass-overlay">
                 <div class="progress-info">
-                  <el-progress :percentage="doc.uploadProgress" status="success" class="upload-progress"
-                    stroke-linecap="square" type="dashboard">
+                  <el-progress
+                    :percentage="doc.uploadProgress"
+                    status="success"
+                    class="upload-progress"
+                    stroke-linecap="square"
+                    type="dashboard"
+                  >
                     <template #default="scoped">
-                      <span class="percentage-value">上传进度:{{ doc.uploadProgress }}%</span>
+                      <span class="percentage-value"
+                        >上传进度:{{ doc.uploadProgress }}%</span
+                      >
                     </template>
                   </el-progress>
                 </div>
@@ -826,7 +1117,10 @@
               </div>
 
               <!-- 添加全局蒙层 -->
-              <div v-if="isMemoryProcessing && !doc.isProcessing" class="glass-overlay memory-processing">
+              <div
+                v-if="isMemoryProcessing && !doc.isProcessing"
+                class="glass-overlay memory-processing"
+              >
                 <div class="progress-info">
                   <div class="progress-text">
                     <el-icon>
@@ -845,13 +1139,18 @@
 
         <!-- 分页 -->
         <div class="page">
-          <el-pagination layout="prev, pager, next" :total="1000" :page-size="num" @current-change="pageChange"
-            :page-count="maxHandlePage" />
+          <el-pagination
+            layout="prev, pager, next"
+            :total="1000"
+            :page-size="num"
+            @current-change="pageChange"
+            :page-count="maxHandlePage"
+          />
         </div>
       </el-tab-pane>
       <el-tab-pane name="repository">
         <template #label>
-          <div :class="{ 'highlight': showHighlight.repository }">
+          <div :class="{ highlight: showHighlight.repository }">
             <div class="main-title">运维知识库</div>
             <div class="sub-title">({{ totalRepository }})</div>
           </div>
@@ -859,11 +1158,25 @@
         <el-row :gutter="20">
           <!-- Add New 按钮 -->
           <el-col :span="100">
-            <el-upload action="/api/file/upload" :data="uploadData" :before-upload="beforeUpload"
-              :on-success="handleSuccess" :on-progress="handleProgress" :on-error="handleError" accept=".pdf"
-              :show-file-list="false" :multiple="true" :disabled="isMemoryProcessing" drag class="upload-card">
-              <el-card class="add-el-card" :style="{ width: '240px', height: '240px' }"
-                :class="{ uploading: loading, disabled: isMemoryProcessing }">
+            <el-upload
+              action="/api/file/upload"
+              :data="uploadData"
+              :before-upload="beforeUpload"
+              :on-success="handleSuccess"
+              :on-progress="handleProgress"
+              :on-error="handleError"
+              accept=".pdf"
+              :show-file-list="false"
+              :multiple="true"
+              :disabled="isMemoryProcessing"
+              drag
+              class="upload-card"
+            >
+              <el-card
+                class="add-el-card"
+                :style="{ width: '240px', height: '240px' }"
+                :class="{ uploading: loading, disabled: isMemoryProcessing }"
+              >
                 <el-icon>
                   <Plus />
                 </el-icon>
@@ -889,18 +1202,49 @@
               <!-- 添加编辑图标和输入框 -->
               <div class="tab-edit">
                 <template v-if="!doc.tags && !doc.isEditing">
-                  <el-button type="info" plain icon="Edit" @click="editTag(doc)" style="color: black">未定义标签</el-button>
+                  <el-button
+                    type="info"
+                    plain
+                    icon="Edit"
+                    @click="editTag(doc)"
+                    style="color: black"
+                    >未定义标签</el-button
+                  >
                 </template>
                 <template v-else-if="!doc.isEditing">
-                  <el-button type="info" plain icon="Edit" @click="editTag(doc)" style="color: black">{{ doc.tags
-                  }}</el-button>
+                  <el-button
+                    type="info"
+                    plain
+                    icon="Edit"
+                    @click="editTag(doc)"
+                    style="color: black"
+                    >{{ doc.tags }}</el-button
+                  >
                 </template>
                 <template v-if="doc.isEditing">
-                  <el-input v-model="doc.tags" @blur="saveTag(doc)" @keyup.enter="saveTag(doc)" ref="tagText"
-                    style="width: 100px" :autofocus="true" />
+                  <el-input
+                    v-model="doc.tags"
+                    @blur="saveTag(doc)"
+                    @keyup.enter="saveTag(doc)"
+                    ref="tagText"
+                    style="width: 100px"
+                    :autofocus="true"
+                  />
                   <div class="button">
-                    <el-button type="info" @click="saveTag(doc)" plain style="color: black">√</el-button>
-                    <el-button type="info" @click="cancelEdit(doc)" plain style="color: black">x</el-button>
+                    <el-button
+                      type="info"
+                      @click="saveTag(doc)"
+                      plain
+                      style="color: black"
+                      >√</el-button
+                    >
+                    <el-button
+                      type="info"
+                      @click="cancelEdit(doc)"
+                      plain
+                      style="color: black"
+                      >x</el-button
+                    >
                   </div>
                 </template>
               </div>
@@ -943,10 +1287,17 @@
               <!-- 毛玻璃上传中-->
               <div v-if="doc.isUploaded" class="glass-overlay">
                 <div class="progress-info">
-                  <el-progress :percentage="doc.uploadProgress" status="success" class="upload-progress"
-                    stroke-linecap="square" type="dashboard">
+                  <el-progress
+                    :percentage="doc.uploadProgress"
+                    status="success"
+                    class="upload-progress"
+                    stroke-linecap="square"
+                    type="dashboard"
+                  >
                     <template #default="scoped">
-                      <span class="percentage-value">上传进度:{{ doc.uploadProgress }}%</span>
+                      <span class="percentage-value"
+                        >上传进度:{{ doc.uploadProgress }}%</span
+                      >
                     </template>
                   </el-progress>
                 </div>
@@ -959,7 +1310,10 @@
               </div>
 
               <!-- 添加全局蒙层 -->
-              <div v-if="isMemoryProcessing && !doc.isProcessing" class="glass-overlay memory-processing">
+              <div
+                v-if="isMemoryProcessing && !doc.isProcessing"
+                class="glass-overlay memory-processing"
+              >
                 <div class="progress-info">
                   <div class="progress-text">
                     <el-icon>
@@ -978,13 +1332,18 @@
 
         <!-- 分页 -->
         <div class="page">
-          <el-pagination layout="prev, pager, next" :total="1000" :page-size="num" @current-change="pageChange"
-            :page-count="maxRepositoryPage" />
+          <el-pagination
+            layout="prev, pager, next"
+            :total="1000"
+            :page-size="num"
+            @current-change="pageChange"
+            :page-count="maxRepositoryPage"
+          />
         </div>
       </el-tab-pane>
       <el-tab-pane name="script">
         <template #label>
-          <div :class="{ 'highlight': showHighlight.script }">
+          <div :class="{ highlight: showHighlight.script }">
             <div class="main-title">数据库脚本</div>
             <div class="sub-title">({{ totalScript }})</div>
           </div>
@@ -992,11 +1351,25 @@
         <el-row :gutter="20">
           <!-- Add New 按钮 -->
           <el-col :span="100">
-            <el-upload action="/api/file/upload" :data="uploadData" :before-upload="beforeUpload"
-              :on-success="handleSuccess" :on-progress="handleProgress" :on-error="handleError" accept=".pdf"
-              :show-file-list="false" :multiple="true" :disabled="isMemoryProcessing" drag class="upload-card">
-              <el-card class="add-el-card" :style="{ width: '240px', height: '240px' }"
-                :class="{ uploading: loading, disabled: isMemoryProcessing }">
+            <el-upload
+              action="/api/file/upload"
+              :data="uploadData"
+              :before-upload="beforeUpload"
+              :on-success="handleSuccess"
+              :on-progress="handleProgress"
+              :on-error="handleError"
+              accept=".pdf"
+              :show-file-list="false"
+              :multiple="true"
+              :disabled="isMemoryProcessing"
+              drag
+              class="upload-card"
+            >
+              <el-card
+                class="add-el-card"
+                :style="{ width: '240px', height: '240px' }"
+                :class="{ uploading: loading, disabled: isMemoryProcessing }"
+              >
                 <el-icon>
                   <Plus />
                 </el-icon>
@@ -1022,18 +1395,49 @@
               <!-- 添加编辑图标和输入框 -->
               <div class="tab-edit">
                 <template v-if="!doc.tags && !doc.isEditing">
-                  <el-button type="info" plain icon="Edit" @click="editTag(doc)" style="color: black">未定义标签</el-button>
+                  <el-button
+                    type="info"
+                    plain
+                    icon="Edit"
+                    @click="editTag(doc)"
+                    style="color: black"
+                    >未定义标签</el-button
+                  >
                 </template>
                 <template v-else-if="!doc.isEditing">
-                  <el-button type="info" plain icon="Edit" @click="editTag(doc)" style="color: black">{{ doc.tags
-                  }}</el-button>
+                  <el-button
+                    type="info"
+                    plain
+                    icon="Edit"
+                    @click="editTag(doc)"
+                    style="color: black"
+                    >{{ doc.tags }}</el-button
+                  >
                 </template>
                 <template v-if="doc.isEditing">
-                  <el-input v-model="doc.tags" @blur="saveTag(doc)" @keyup.enter="saveTag(doc)" ref="tagText"
-                    style="width: 100px" :autofocus="true" />
+                  <el-input
+                    v-model="doc.tags"
+                    @blur="saveTag(doc)"
+                    @keyup.enter="saveTag(doc)"
+                    ref="tagText"
+                    style="width: 100px"
+                    :autofocus="true"
+                  />
                   <div class="button">
-                    <el-button type="info" @click="saveTag(doc)" plain style="color: black">√</el-button>
-                    <el-button type="info" @click="cancelEdit(doc)" plain style="color: black">x</el-button>
+                    <el-button
+                      type="info"
+                      @click="saveTag(doc)"
+                      plain
+                      style="color: black"
+                      >√</el-button
+                    >
+                    <el-button
+                      type="info"
+                      @click="cancelEdit(doc)"
+                      plain
+                      style="color: black"
+                      >x</el-button
+                    >
                   </div>
                 </template>
               </div>
@@ -1076,10 +1480,18 @@
               <!-- 毛玻璃上传中-->
               <div v-if="doc.isUploaded" class="glass-overlay">
                 <div class="progress-info">
-                  <el-progress v-if="doc.isUploaded" :percentage="doc.uploadProgress" status="success"
-                    class="upload-progress" stroke-linecap="square" type="dashboard">
+                  <el-progress
+                    v-if="doc.isUploaded"
+                    :percentage="doc.uploadProgress"
+                    status="success"
+                    class="upload-progress"
+                    stroke-linecap="square"
+                    type="dashboard"
+                  >
                     <template #default="scoped">
-                      <span class="percentage-value">上传进度:{{ doc.uploadProgress }}%</span>
+                      <span class="percentage-value"
+                        >上传进度:{{ doc.uploadProgress }}%</span
+                      >
                     </template>
                   </el-progress>
                 </div>
@@ -1092,7 +1504,10 @@
               </div>
 
               <!-- 添加全局蒙层 -->
-              <div v-if="isMemoryProcessing && !doc.isProcessing" class="glass-overlay memory-processing">
+              <div
+                v-if="isMemoryProcessing && !doc.isProcessing"
+                class="glass-overlay memory-processing"
+              >
                 <div class="progress-info">
                   <div class="progress-text">
                     <el-icon>
@@ -1111,44 +1526,72 @@
 
         <!-- 分页 -->
         <div class="page">
-          <el-pagination layout="prev, pager, next" :total="1000" :page-size="num" @current-change="pageChange"
-            :page-count="maxScriptPage" />
+          <el-pagination
+            layout="prev, pager, next"
+            :total="1000"
+            :page-size="num"
+            @current-change="pageChange"
+            :page-count="maxScriptPage"
+          />
         </div>
       </el-tab-pane>
     </el-tabs>
   </div>
 
   <!-- 添加PDF预览弹窗 -->
-  <el-dialog v-model="previewVisible" title="PDF预览" width="80%" @closed="closePreview">
+  <el-dialog
+    v-model="previewVisible"
+    title="PDF预览"
+    width="80%"
+    @closed="closePreview"
+  >
     <div v-loading="previewLoading" class="pdf-preview-container">
       <canvas id="pdf-canvas" class="pdf-canvas"></canvas>
       <div v-if="!previewLoading" class="pdf-pagination">
-        <el-button :disabled="currentPage <= 1" @click="currentPage--; renderPage(currentPage)">
+        <el-button
+          :disabled="currentPage <= 1"
+          @click="
+            currentPage--;
+            renderPage(currentPage);
+          "
+        >
           上一页
         </el-button>
         <span>第 {{ currentPage }} 页 / 共 {{ totalPages }} 页</span>
-        <el-button :disabled="currentPage >= totalPages" @click="currentPage++; renderPage(currentPage)">
+        <el-button
+          :disabled="currentPage >= totalPages"
+          @click="
+            currentPage++;
+            renderPage(currentPage);
+          "
+        >
           下一页
         </el-button>
       </div>
     </div>
   </el-dialog>
-
 </template>
 
 <script setup>
-import { ref, onMounted, getCurrentInstance, reactive, onUnmounted, computed } from 'vue';
+import {
+  ref,
+  onMounted,
+  getCurrentInstance,
+  reactive,
+  onUnmounted,
+  computed
+} from 'vue';
 import { ElMessage } from 'element-plus';
 // 修改PDF.js配置方式
-import { getDocument, GlobalWorkerOptions, version } from 'pdfjs-dist'
-import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.mjs?url'
+import { getDocument, GlobalWorkerOptions, version } from 'pdfjs-dist';
+import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.mjs?url';
 
 // 重新组织pdfjsLib对象
 const pdfjsLib = {
   getDocument,
   GlobalWorkerOptions,
   version
-}
+};
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
@@ -1175,27 +1618,27 @@ onMounted(() => {
 const page = ref(1);
 const num = ref(23);
 
-const maxPage = ref(1);//法律法规
-const maxPolicyPage = ref(1);//政策解读
-const maxHandlePage = ref(1);//用户手册
-const maxScriptPage = ref(1);//数据库脚本
-const maxOfficialPage = ref(1);//公文
-const maxRepositoryPage = ref(1);//运维知识库
-const maxReportPage = ref(1);//调研报告
-const maxBookPage = ref(1);//图书
+const maxPage = ref(1); //法律法规
+const maxPolicyPage = ref(1); //政策解读
+const maxHandlePage = ref(1); //用户手册
+const maxScriptPage = ref(1); //数据库脚本
+const maxOfficialPage = ref(1); //公文
+const maxRepositoryPage = ref(1); //运维知识库
+const maxReportPage = ref(1); //调研报告
+const maxBookPage = ref(1); //图书
 
 const totalFiles = ref(0);
 const circleUrl = ref('/assets/images/avatar.png');
-const activeName = ref('law')
+const activeName = ref('law');
 
-const documents = ref([]);//法律法规
-const handlebook = ref([]);//用户及操作手册
-const repository = ref([]);//运维知识库
-const script = ref([]);//数据库脚本
-const policy = ref([]);//政策解读
-const official = ref([]);//公文
-const report = ref([]);//调研报告
-const book = ref([]);//图书
+const documents = ref([]); //法律法规
+const handlebook = ref([]); //用户及操作手册
+const repository = ref([]); //运维知识库
+const script = ref([]); //数据库脚本
+const policy = ref([]); //政策解读
+const official = ref([]); //公文
+const report = ref([]); //调研报告
+const book = ref([]); //图书
 const selectedTags = ref([]);
 const isMemoryProcessing = ref(false); // 添加全局状态控制蒙层
 
@@ -1203,17 +1646,17 @@ const mapDocumentData = (item) => ({
   title: item.file_name,
   type: 'pdf',
   docURL: item.file_path,
-  isProcessing: false,//深度记忆中
+  isProcessing: false, //深度记忆中
   isUploaded: false,
-  uploadProgress: 0,//上传进度
-  status: [1, 2].includes(item.status) ? '未记忆' : '已记忆',//记忆状态
-  tags: item.tag,//二级标签
+  uploadProgress: 0, //上传进度
+  status: [1, 2].includes(item.status) ? '未记忆' : '已记忆', //记忆状态
+  tags: item.tag, //二级标签
   parse: false,
   parseProgress: 0,
   finish: true,
-  id: item.id,//数据库对应唯一id
+  id: item.id, //数据库对应唯一id
   isMemory: item.status === 3,
-  isEditing: false,//编辑状态
+  isEditing: false, //编辑状态
   progress: item.status === 3 ? 100 : 0,
   uid: 0
 });
@@ -1222,20 +1665,22 @@ const mapDocumentData = (item) => ({
 const getFileList = async () => {
   const result = await proxy.$GET({
     url: 'file/getfilelist',
-    params: { page: page.value, num: num.value, type: 'law', keywords: searchQuery.value ?? '', tag: selectedTags.value.join(',') }
+    params: {
+      page: page.value,
+      num: num.value,
+      type: 'law',
+      keywords: searchQuery.value ?? '',
+      tag: selectedTags.value.join(',')
+    }
   });
   if (result.code == 0) {
-
     totalFiles.value = 0;
     documents.value = [];
-    return false
-
+    return false;
   }
   maxPage.value = Math.ceil(result.data.count / num.value);
   totalFiles.value = result.data.count;
   documents.value = result.data.data.map(mapDocumentData);
-
-
 };
 
 // 获取标签列表
@@ -1263,9 +1708,7 @@ const getQuerySearch = async () => {
   }
 };
 
-
-
-const totalPolicy = ref(0)
+const totalPolicy = ref(0);
 const getPolicyList = async () => {
   var result = await proxy.$GET({
     url: 'file/getpolicy',
@@ -1279,10 +1722,10 @@ const getPolicyList = async () => {
   if (result.code === 0) {
     totalPolicy.value = 0;
     policy.value = [];
-    return false
+    return false;
   }
   maxPolicyPage.value = Math.ceil(result.data.count / num.value);
-  totalPolicy.value = result.data.count
+  totalPolicy.value = result.data.count;
   policy.value = result.data.data.map(mapDocumentData);
 };
 
@@ -1300,10 +1743,10 @@ const getOfficialList = async () => {
   if (result.code === 0) {
     totalOfficial.value = 0;
     policy.value = [];
-    return false
+    return false;
   }
   maxOfficialPage.value = Math.ceil(result.data.count / num.value);
-  totalOfficial.value = result.data.count
+  totalOfficial.value = result.data.count;
   official.value = result.data.data.map(mapDocumentData);
 };
 
@@ -1321,10 +1764,10 @@ const getReportList = async () => {
   if (result.code === 0) {
     totalReport.value = 0;
     report.value = [];
-    return false
+    return false;
   }
   maxReportPage.value = Math.ceil(result.data.count / num.value);
-  totalReport.value = result.data.count
+  totalReport.value = result.data.count;
   report.value = result.data.data.map(mapDocumentData);
 };
 
@@ -1342,13 +1785,12 @@ const getBookList = async () => {
   if (result.code === 0) {
     totalBook.value = 0;
     book.value = [];
-    return false
+    return false;
   }
   maxBookPage.value = Math.ceil(result.data.count / num.value);
-  totalBook.value = result.data.count
+  totalBook.value = result.data.count;
   book.value = result.data.data.map(mapDocumentData);
 };
-
 
 const totalHandleBook = ref(0);
 const getHandlebookList = async () => {
@@ -1364,10 +1806,10 @@ const getHandlebookList = async () => {
   if (result.code === 0) {
     totalHandleBook.value = 0;
     handlebook.value = [];
-    return false
+    return false;
   }
   maxHandlePage.value = Math.ceil(result.data.count / num.value);
-  totalHandleBook.value = result.data.count
+  totalHandleBook.value = result.data.count;
   handlebook.value = result.data.data.map(mapDocumentData);
 };
 
@@ -1385,13 +1827,12 @@ const getRepositoryList = async () => {
   if (result.code === 0) {
     totalRepository.value = 0;
     repository.value = [];
-    return false
+    return false;
   }
   maxRepositoryPage.value = Math.ceil(result.data.count / num.value);
-  totalRepository.value = result.data.count
+  totalRepository.value = result.data.count;
   repository.value = result.data.data.map(mapDocumentData);
 };
-
 
 const totalScript = ref(0);
 const getScriptList = async () => {
@@ -1407,10 +1848,10 @@ const getScriptList = async () => {
   if (result.code === 0) {
     totalScript.value = 0;
     script.value = [];
-    return false
+    return false;
   }
   maxScriptPage.value = Math.ceil(result.data.count / num.value);
-  totalScript.value = result.data.count
+  totalScript.value = result.data.count;
   script.value = result.data.data.map(mapDocumentData);
 };
 
@@ -1419,7 +1860,6 @@ const connectWebsocket = async () => {
     if (ws.value) {
       ws.value.close();
     }
-
 
     ws.value = new WebSocket('ws://192.168.6.185:8000/ws');
 
@@ -1433,9 +1873,6 @@ const connectWebsocket = async () => {
       console.log('WebSocket连接已建立');
       setupWebSocketHandler();
     };
-
-
-
   } catch (error) {
     console.error('WebSocket连接失败:', error);
   }
@@ -1446,13 +1883,12 @@ const tags = ref([]);
 
 const selectedTagsMap = reactive({});
 
-
 // 标签状态变化处理
 const handleTagChange = (tag) => {
   selectedTagsMap[tag] = !selectedTagsMap[tag];
   updateSelectedTags();
-  page.value = 1
-  getFileList()
+  page.value = 1;
+  getFileList();
 };
 
 // 更新选中标签数组
@@ -1464,16 +1900,13 @@ const updateSelectedTags = () => {
   );
 };
 
-
 // 上传相关状态
 const loading = ref(false);
 
 // 添加上传类型参数
 const uploadData = computed(() => ({
   type: activeName.value
-
 }));
-
 
 // 在beforeUpload中更新参数
 const beforeUpload = (file) => {
@@ -1518,8 +1951,7 @@ const beforeUpload = (file) => {
     official: official,
     report: report,
     book: book,
-    handlebook: handlebook,
-
+    handlebook: handlebook
   }[activeName.value]?.value;
 
   if (targetArray) {
@@ -1529,24 +1961,24 @@ const beforeUpload = (file) => {
     return false;
   }
 
-
-
   return true;
 };
 
 // 上传进度条
 const handleProgress = (event, file) => {
-  const findInArray = (arr) => arr.value.find(d => d.uid === file.uid)
-  const targetDoc = findInArray(documents) || findInArray(policy) || findInArray(repository)
-    || findInArray(script)
-    || findInArray(official)
-    || findInArray(report)
-    || findInArray(book);
+  const findInArray = (arr) => arr.value.find((d) => d.uid === file.uid);
+  const targetDoc =
+    findInArray(documents) ||
+    findInArray(policy) ||
+    findInArray(repository) ||
+    findInArray(script) ||
+    findInArray(official) ||
+    findInArray(report) ||
+    findInArray(book);
   if (targetDoc) {
     targetDoc.uploadProgress = event.percent;
   }
 };
-
 
 const handleSuccess = async (response, uploadFile) => {
   loading.value = false;
@@ -1560,13 +1992,12 @@ const handleSuccess = async (response, uploadFile) => {
     script: totalScript,
     report: totalReport,
     book: totalBook,
-    handlebook: totalHandleBook,
+    handlebook: totalHandleBook
   }[activeName.value];
 
   if (counterMap) {
     counterMap.value++;
   }
-
 
   // 查找并更新对应文档状态
   const targetArrayMap = {
@@ -1580,24 +2011,23 @@ const handleSuccess = async (response, uploadFile) => {
   }[activeName.value]?.value;
 
   if (targetArrayMap) {
-    const targetDoc = targetArrayMap.find(d => d.uid === uploadFile.uid);
+    const targetDoc = targetArrayMap.find((d) => d.uid === uploadFile.uid);
     if (targetDoc) {
       // 关闭上传状态，开启解析状态
       targetDoc.docURL = response.data.url;
       targetDoc.id = response.data.id;
       setTimeout(() => {
         targetDoc.isUploaded = false;
-      }, 500)
-
+      }, 500);
     }
   }
 
-  return
+  return;
 
   // 发送消息前检查连接状态
   if (ws.value?.readyState !== WebSocket.OPEN) {
     // ElMessage.warning('websocket连接未就绪');
-    console.log("websocket连接未就绪");
+    console.log('websocket连接未就绪');
     return;
   }
 
@@ -1612,7 +2042,7 @@ const handleSuccess = async (response, uploadFile) => {
     base64Data,
     type: activeName.value
   });
-}
+};
 
 // 统一的消息处理器
 const setupWebSocketHandler = () => {
@@ -1624,7 +2054,7 @@ const setupWebSocketHandler = () => {
       ElMessage.error(data.message);
 
       // 立即从解析队列中移除失败项
-      parseQueue.value = parseQueue.value.filter(item => item.id != data.id);
+      parseQueue.value = parseQueue.value.filter((item) => item.id != data.id);
       try {
         const result = await proxy.$GET({
           url: 'file/deletefile',
@@ -1633,7 +2063,7 @@ const setupWebSocketHandler = () => {
 
         if (result.code === 1) {
           // 从界面移除文档
-          documents.value = documents.value.filter(d => d.id != data.id);
+          documents.value = documents.value.filter((d) => d.id != data.id);
 
           // 强制继续解析
           isParsing.value = false;
@@ -1646,7 +2076,7 @@ const setupWebSocketHandler = () => {
         startNextParse();
       }
     } else {
-      const targetDoc = documents.value.find(d => d.id === data.id);
+      const targetDoc = documents.value.find((d) => d.id === data.id);
 
       if (targetDoc) {
         targetDoc.parseProgress = Math.floor(data.progress);
@@ -1670,7 +2100,7 @@ const startNextParse = () => {
   console.log(parseQueue.value);
   const currentDoc = parseQueue.value[0];
 
-  const targetDoc = documents.value.find(d => d.id === currentDoc.id);
+  const targetDoc = documents.value.find((d) => d.id === currentDoc.id);
   console.log(targetDoc);
   if (targetDoc) {
     targetDoc.parse = true;
@@ -1687,8 +2117,6 @@ const startNextParse = () => {
     startNextParse();
   }
 };
-
-
 
 // 添加文件到解析队列
 const addToParseQueue = (fileData) => {
@@ -1718,7 +2146,6 @@ const sendViaWebSocket = (data) => {
   }
 };
 
-
 // 上传错误处理
 const handleError = (err) => {
   loading.value = false;
@@ -1743,7 +2170,7 @@ const simulateProgress = async (doc) => {
     sendViaWebSocket({
       type: 'deepMemory',
       filename: doc.title,
-      id: doc.id,
+      id: doc.id
     });
   }
 };
@@ -1753,54 +2180,54 @@ const pdfUrl = ref('');
 
 // 预览pdf
 const previewPdf = async (doc) => {
-  previewVisible.value = true
-  previewLoading.value = true
-  pdfUrl.value = doc.docURL
+  previewVisible.value = true;
+  previewLoading.value = true;
+  pdfUrl.value = doc.docURL;
 
   try {
     // 初始化PDF文档
-    const loadingTask = pdfjsLib.getDocument(pdfUrl.value)
-    pdfDoc = await loadingTask.promise
-    totalPages.value = pdfDoc.numPages
+    const loadingTask = pdfjsLib.getDocument(pdfUrl.value);
+    pdfDoc = await loadingTask.promise;
+    totalPages.value = pdfDoc.numPages;
 
     // 渲染第一页
-    await renderPage(currentPage.value)
+    await renderPage(currentPage.value);
   } catch (error) {
-    ElMessage.error('PDF加载失败: ' + error.message)
-    previewVisible.value = false
+    ElMessage.error('PDF加载失败: ' + error.message);
+    previewVisible.value = false;
   } finally {
-    previewLoading.value = false
+    previewLoading.value = false;
   }
-}
+};
 
 // 添加页面渲染方法
 const renderPage = async (num) => {
-  if (!pdfDoc || num < 1 || num > totalPages.value) return
+  if (!pdfDoc || num < 1 || num > totalPages.value) return;
 
-  const page = await pdfDoc.getPage(num)
-  const canvas = document.getElementById('pdf-canvas')
-  const context = canvas.getContext('2d')
+  const page = await pdfDoc.getPage(num);
+  const canvas = document.getElementById('pdf-canvas');
+  const context = canvas.getContext('2d');
 
   // 设置缩放比例
-  const viewport = page.getViewport({ scale: 1.5 })
-  canvas.height = viewport.height
-  canvas.width = viewport.width
+  const viewport = page.getViewport({ scale: 1.5 });
+  canvas.height = viewport.height;
+  canvas.width = viewport.width;
 
   // 渲染页面
   await page.render({
     canvasContext: context,
     viewport: viewport
-  }).promise
-}
+  }).promise;
+};
 
 // 添加弹窗关闭处理
 const closePreview = () => {
-  previewVisible.value = false
+  previewVisible.value = false;
   if (pdfDoc) {
-    pdfDoc.destroy()
-    pdfDoc = null
+    pdfDoc.destroy();
+    pdfDoc = null;
   }
-}
+};
 
 const tagText = ref(null);
 
@@ -1855,13 +2282,12 @@ const pageChange = async (data) => {
     script: getScriptList,
     report: getReportList,
     book: getBookList,
-    handlebook: getHandlebookList,
+    handlebook: getHandlebookList
   }[activeName.value];
 
   if (targetArrayMap) {
     targetArrayMap();
   }
-
 };
 
 const showHighlight = reactive({
@@ -1923,7 +2349,7 @@ const createFilter = (queryString) => {
 // 重置
 const resetAll = async () => {
   searchQuery.value = '';
-  selectedTags.value = []
+  selectedTags.value = [];
   page.value = 1;
   getFileList();
   getPolicyList();
@@ -1936,13 +2362,12 @@ const resetAll = async () => {
   // 循环遍历所有分类，将高亮状态重置为false
   Object.keys(showHighlight).forEach((key) => {
     showHighlight[key] = false;
-  })
+  });
 };
 
 const handleSelect = (item) => {
   console.log(item);
 };
-
 
 // 新增文件名截断方法
 const truncateFileName = (name, maxLength) => {
@@ -1963,7 +2388,7 @@ const truncateFileName = (name, maxLength) => {
 
 const logout = () => {
   proxy.$router.push('/');
-}
+};
 
 const handleClick = (tab, event) => {
   activeName.value = tab.props.name;
@@ -1971,29 +2396,29 @@ const handleClick = (tab, event) => {
 
 // 新增canvas初始化方法
 const initCanvas = async (canvas, doc) => {
-  if (!canvas || !doc?.docURL) return
+  if (!canvas || !doc?.docURL) return;
 
-  const loadingTask = pdfjsLib.getDocument(doc.docURL)
+  const loadingTask = pdfjsLib.getDocument(doc.docURL);
   try {
-    const pdf = await loadingTask.promise
-    const page = await pdf.getPage(1)
+    const pdf = await loadingTask.promise;
+    const page = await pdf.getPage(1);
 
-    const viewport = page.getViewport({ scale: 1.5 })
-    const context = canvas.getContext('2d')
+    const viewport = page.getViewport({ scale: 1.5 });
+    const context = canvas.getContext('2d');
 
-    canvas.height = viewport.height
-    canvas.width = viewport.width
+    canvas.height = viewport.height;
+    canvas.width = viewport.width;
 
     const renderContext = {
       canvasContext: context,
       viewport: viewport
-    }
+    };
 
-    await page.render(renderContext).promise
+    await page.render(renderContext).promise;
   } catch (error) {
-    console.error('PDF渲染失败:', error)
+    console.error('PDF渲染失败:', error);
   }
-}
+};
 
 // 添加清理逻辑
 onUnmounted(() => {
@@ -2005,13 +2430,12 @@ onUnmounted(() => {
 });
 
 // 添加预览相关状态
-const previewVisible = ref(false)
-const previewLoading = ref(false)
+const previewVisible = ref(false);
+const previewLoading = ref(false);
 
-const currentPage = ref(1)
-const totalPages = ref(0)
-let pdfDoc = null
-
+const currentPage = ref(1);
+const totalPages = ref(0);
+let pdfDoc = null;
 </script>
 
 <style scoped>
