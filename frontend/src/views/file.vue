@@ -460,21 +460,34 @@
           />
         </div>
       </el-tab-pane>
-      <!-- <el-tab-pane name="official">
+      <el-tab-pane name="official">
         <template #label>
-          <div :class="{ 'highlight': showHighlight.official }">
-            <div class="main-title">公文</div>
+          <div :class="{ highlight: showHighlight.official }">
+            <div class="main-title">金句</div>
             <div class="sub-title">({{ totalOfficial }})</div>
           </div>
         </template>
         <el-row :gutter="20">
-   
           <el-col :span="100">
-            <el-upload action="/api/file/upload" :data="uploadData" :before-upload="beforeUpload"
-              :on-success="handleSuccess" :on-progress="handleProgress" :on-error="handleError" accept=".pdf"
-              :show-file-list="false" :multiple="true" :disabled="isMemoryProcessing" drag class="upload-card">
-              <el-card class="add-el-card" :style="{ width: '240px', height: '240px' }"
-                :class="{ uploading: loading, disabled: isMemoryProcessing }">
+            <el-upload
+              action="/api/file/upload"
+              :data="uploadData"
+              :before-upload="beforeUpload"
+              :on-success="handleSuccess"
+              :on-progress="handleProgress"
+              :on-error="handleError"
+              accept=".pdf"
+              :show-file-list="false"
+              :multiple="true"
+              :disabled="isMemoryProcessing"
+              drag
+              class="upload-card"
+            >
+              <el-card
+                class="add-el-card"
+                :style="{ width: '240px', height: '240px' }"
+                :class="{ uploading: loading, disabled: isMemoryProcessing }"
+              >
                 <el-icon>
                   <Plus />
                 </el-icon>
@@ -495,34 +508,64 @@
 
           <el-col :span="100" v-for="(doc, index) in official" :key="index">
             <el-card :style="{ width: '240px', height: '240px' }">
-             
               <div class="tab-edit">
                 <template v-if="!doc.tags && !doc.isEditing">
-                  <el-button type="info" plain icon="Edit" @click="editTag(doc)" style="color: black">未定义标签</el-button>
+                  <el-button
+                    type="info"
+                    plain
+                    icon="Edit"
+                    @click="editTag(doc)"
+                    style="color: black"
+                    >未定义标签</el-button
+                  >
                 </template>
                 <template v-else-if="!doc.isEditing">
-                  <el-button type="info" plain icon="Edit" @click="editTag(doc)" style="color: black">{{ doc.tags
-                  }}</el-button>
+                  <el-button
+                    type="info"
+                    plain
+                    icon="Edit"
+                    @click="editTag(doc)"
+                    style="color: black"
+                    >{{ doc.tags }}</el-button
+                  >
                 </template>
                 <template v-if="doc.isEditing">
-                  <el-input v-model="doc.tags" @blur="saveTag(doc)" @keyup.enter="saveTag(doc)" ref="tagText"
-                    style="width: 100px" :autofocus="true" />
+                  <el-input
+                    v-model="doc.tags"
+                    @blur="saveTag(doc)"
+                    @keyup.enter="saveTag(doc)"
+                    ref="tagText"
+                    style="width: 100px"
+                    :autofocus="true"
+                  />
                   <div class="button">
-                    <el-button type="info" @click="saveTag(doc)" plain style="color: black">√</el-button>
-                    <el-button type="info" @click="cancelEdit(doc)" plain style="color: black">x</el-button>
+                    <el-button
+                      type="info"
+                      @click="saveTag(doc)"
+                      plain
+                      style="color: black"
+                      >√</el-button
+                    >
+                    <el-button
+                      type="info"
+                      @click="cancelEdit(doc)"
+                      plain
+                      style="color: black"
+                      >x</el-button
+                    >
                   </div>
                 </template>
               </div>
-             
+
               <div slot="header" class="title">
                 <el-tooltip :content="doc.title" placement="top">
                   <span>{{ truncateFileName(doc.title, 9) }}</span>
                 </el-tooltip>
               </div>
-             
+
               <div class="content">
                 <embed :src="doc.docURL" class="doc-preview" />
-                
+
                 <div class="ms" v-if="doc.parse">
                   解析进度：{{ doc.parseProgress }}%
                 </div>
@@ -530,10 +573,17 @@
 
               <div v-if="doc.isUploaded" class="glass-overlay">
                 <div class="progress-info">
-                  <el-progress :percentage="doc.uploadProgress" status="success" class="upload-progress"
-                    stroke-linecap="square" type="dashboard">
+                  <el-progress
+                    :percentage="doc.uploadProgress"
+                    status="success"
+                    class="upload-progress"
+                    stroke-linecap="square"
+                    type="dashboard"
+                  >
                     <template #default="scoped">
-                      <span class="percentage-value">上传进度:{{ doc.uploadProgress }}%</span>
+                      <span class="percentage-value"
+                        >上传进度:{{ doc.uploadProgress }}%</span
+                      >
                     </template>
                   </el-progress>
                 </div>
@@ -545,7 +595,10 @@
                 </div>
               </div>
 
-              <div v-if="isMemoryProcessing && !doc.isProcessing" class="glass-overlay memory-processing">
+              <div
+                v-if="isMemoryProcessing && !doc.isProcessing"
+                class="glass-overlay memory-processing"
+              >
                 <div class="progress-info">
                   <div class="progress-text">
                     <el-icon>
@@ -563,12 +616,15 @@
         </el-row>
 
         <div class="page">
-          <el-pagination layout="prev, pager, next" :total="1000" :page-size="num" @current-change="pageChange"
-            :page-count="maxOfficialPage" />
+          <el-pagination
+            layout="prev, pager, next"
+            :total="1000"
+            :page-size="num"
+            @current-change="pageChange"
+            :page-count="maxOfficialPage"
+          />
         </div>
-
-
-      </el-tab-pane> -->
+      </el-tab-pane>
       <el-tab-pane name="report">
         <template #label>
           <div :class="{ highlight: showHighlight.report }">
