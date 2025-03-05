@@ -74,8 +74,9 @@ const handleLogin = () => {
                 if (result.data.status === "repassword") {
                     proxy.$router.push('/repassword')
                 } else if (result.data.status === "success") {
-                    const url = `http://192.168.30.23:7860?token=${proxy.$token.value}`;
-                    window.location.href = url;
+                    proxy.$router.push('/file')
+                    // const url = `http://192.168.30.23:7860?token=${proxy.$token.value}`;
+                    // window.location.href = url;
                 }
             }, 1000);
         }

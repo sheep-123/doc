@@ -52,15 +52,6 @@ app.get('/', (req, res) => {
 require('./app/routes/file')(app);
 require('./app/routes/user')(app);
 
-// 创建上传目录
-const uploadDir = path.join(__dirname, 'app/uploads');
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true }); // 递归创建目录
-}
-
-// 配置静态资源访问
-app.use('/uploads', express.static(uploadDir));
-
 
 // set port, listen for requests
 // 环境变量优先，默认

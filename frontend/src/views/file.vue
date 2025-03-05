@@ -61,7 +61,7 @@
         <template #label>
           <div :class="{ highlight: showHighlight.law }">
             <div class="main-title">法律法规</div>
-            <div class="sub-title">({{ totalFiles }})</div>
+            <div class="sub-title">({{ totalFiles??0 }})</div>
           </div>
         </template>
         <!-- 二级标签 -->
@@ -258,7 +258,7 @@
         </el-row>
 
         <!-- 分页 -->
-        <div class="page">
+        <div class="page" v-show="maxPage>0">
           <el-pagination
             layout="prev, pager, next"
             :total="1000"
@@ -272,7 +272,7 @@
         <template #label>
           <div :class="{ highlight: showHighlight.policy }">
             <div class="main-title">政策解读</div>
-            <div class="sub-title">({{ totalPolicy }})</div>
+            <div class="sub-title">({{ totalPolicy??0 }})</div>
           </div>
         </template>
         <el-row :gutter="20">
@@ -450,7 +450,7 @@
           </el-col>
         </el-row>
         <!-- 分页 -->
-        <div class="page">
+        <div class="page" v-show="maxPolicyPage>0">
           <el-pagination
             layout="prev, pager, next"
             :total="1000"
@@ -464,7 +464,7 @@
         <template #label>
           <div :class="{ highlight: showHighlight.official }">
             <div class="main-title">金句</div>
-            <div class="sub-title">({{ totalOfficial }})</div>
+            <div class="sub-title">({{ totalOfficial??0 }})</div>
           </div>
         </template>
         <el-row :gutter="20">
@@ -615,7 +615,7 @@
           </el-col>
         </el-row>
 
-        <div class="page">
+        <div class="page" v-show="maxOfficialPage>0">
           <el-pagination
             layout="prev, pager, next"
             :total="1000"
@@ -629,7 +629,7 @@
         <template #label>
           <div :class="{ highlight: showHighlight.report }">
             <div class="main-title">调研报告</div>
-            <div class="sub-title">({{ totalReport }})</div>
+            <div class="sub-title">({{ totalReport??0 }})</div>
           </div>
         </template>
         <el-row :gutter="20">
@@ -807,7 +807,7 @@
           </el-col>
         </el-row>
         <!-- 分页 -->
-        <div class="page">
+        <div class="page" v-show="maxReportPage>0">
           <el-pagination
             layout="prev, pager, next"
             :total="1000"
@@ -821,7 +821,7 @@
         <template #label>
           <div :class="{ highlight: showHighlight.book }">
             <div class="main-title">指导书</div>
-            <div class="sub-title">({{ totalBook }})</div>
+            <div class="sub-title">({{ totalBook??0 }})</div>
           </div>
         </template>
 
@@ -1001,7 +1001,7 @@
         </el-row>
 
         <!-- 分页 -->
-        <div class="page">
+        <div class="page" v-show="maxBookPage>0">
           <el-pagination
             layout="prev, pager, next"
             :total="1000"
@@ -1015,7 +1015,7 @@
         <template #label>
           <div :class="{ highlight: showHighlight.handlebook }">
             <div class="main-title">用户及操作手册</div>
-            <div class="sub-title">({{ totalHandleBook }})</div>
+            <div class="sub-title">({{ totalHandleBook??0 }})</div>
           </div>
         </template>
         <el-row :gutter="20">
@@ -1194,7 +1194,7 @@
         </el-row>
 
         <!-- 分页 -->
-        <div class="page">
+        <div class="page" v-show="maxHandlePage>0">
           <el-pagination
             layout="prev, pager, next"
             :total="1000"
@@ -1208,7 +1208,7 @@
         <template #label>
           <div :class="{ highlight: showHighlight.repository }">
             <div class="main-title">运维知识库</div>
-            <div class="sub-title">({{ totalRepository }})</div>
+            <div class="sub-title">({{ totalRepository??0 }})</div>
           </div>
         </template>
         <el-row :gutter="20">
@@ -1387,7 +1387,7 @@
         </el-row>
 
         <!-- 分页 -->
-        <div class="page">
+        <div class="page" v-show="maxRepositoryPage>0">
           <el-pagination
             layout="prev, pager, next"
             :total="1000"
@@ -1401,7 +1401,7 @@
         <template #label>
           <div :class="{ highlight: showHighlight.script }">
             <div class="main-title">数据库脚本</div>
-            <div class="sub-title">({{ totalScript }})</div>
+            <div class="sub-title">({{ totalScript??0 }})</div>
           </div>
         </template>
         <el-row :gutter="20">
@@ -1581,7 +1581,7 @@
         </el-row>
 
         <!-- 分页 -->
-        <div class="page">
+        <div class="page" v-show="maxScriptPage>0">
           <el-pagination
             layout="prev, pager, next"
             :total="1000"
@@ -1655,7 +1655,7 @@ const { proxy } = getCurrentInstance();
 const ws = ref(null);
 const parseQueue = ref([]);
 const isParsing = ref(false);
-
+const localIP = ref('');
 onMounted(() => {
   getFileList();
   getTagList();
@@ -1668,7 +1668,29 @@ onMounted(() => {
   getHandlebookList();
   getRepositoryList();
   getBookList();
+   getLocalIP().then(ip => localIP.value = ip);
 });
+
+// 添加获取本机IP的方法
+const getLocalIP = () => {
+  return new Promise((resolve) => {
+    const pc = new RTCPeerConnection({ iceServers: [] });
+    pc.createDataChannel('');
+    
+    pc.createOffer().then(sdp => {
+      pc.setLocalDescription(sdp);
+    }).catch(console.error);
+
+    pc.onicecandidate = (ice) => {
+      if (ice.candidate) {
+        const ip = ice.candidate.address.match(/([0-9]{1,3}\.){3}[0-9]{1,3}/)[0];
+        pc.onicecandidate = null;
+        pc.close();
+        resolve(ip);
+      }
+    };
+  });
+};
 
 // 分页
 const page = ref(1);
@@ -1702,6 +1724,7 @@ const mapDocumentData = (item) => ({
   title: item.file_name,
   type: 'pdf',
   docURL: item.file_path,
+  // docURL: `${localIP.value}:5173/uploads/pdf/${item.file_path}`,
   isProcessing: false, //深度记忆中
   isUploaded: false,
   uploadProgress: 0, //上传进度
@@ -2071,6 +2094,7 @@ const handleSuccess = async (response, uploadFile) => {
     if (targetDoc) {
       // 关闭上传状态，开启解析状态
       targetDoc.docURL = response.data.url;
+      //  targetDoc.docURL = `${localIP.value}:5173/uploads/pdf/${response.data.url}`;
       targetDoc.id = response.data.id;
       setTimeout(() => {
         targetDoc.isUploaded = false;
@@ -2153,11 +2177,10 @@ const startNextParse = () => {
   if (parseQueue.value.length === 0 || isParsing.value) return;
 
   isParsing.value = true;
-  console.log(parseQueue.value);
   const currentDoc = parseQueue.value[0];
 
   const targetDoc = documents.value.find((d) => d.id === currentDoc.id);
-  console.log(targetDoc);
+
   if (targetDoc) {
     targetDoc.parse = true;
     sendViaWebSocket({

@@ -143,7 +143,7 @@ exports.upload = [
         .replace(/[^a-zA-Z0-9\u4e00-\u9fa5\-_.]/g, '');
 
       // 生成完整URL路径
-      const domain = `${req.protocol}://${getIPAddress()}:5173`;
+      // const domain = `${req.protocol}://${getIPAddress()}:5173`;
       // 在生成URL的部分需要同步修改：
       const filePath = `/uploads/pdf/${req.file.filename}`;
 
