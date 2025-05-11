@@ -336,62 +336,6 @@
   margin-bottom: 0;
 }
 
-.nav {
-  position: sticky;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 10000;
-  height: 65px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  /* margin-bottom: 20px; */
-  background-color: white;
-  border-bottom: 1px solid #e5e7eb;
-  .nav-left {
-    display: flex;
-    align-items: center;
-    margin-left: 30px;
-    gap: 11px;
-
-    @media screen and (max-width: 640px) {
-      margin-left: 23px;
-      
-    }
-    .title {
-      font-size: 27px;
-      font-weight: 800;
-      color: #393939;
-      letter-spacing: -2px;
-    }
-  }
-
-  .nav-right {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-right: 50px;
-    .left {
-      box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3),
-        -2px 0px 4px rgba(0, 0, 0, 0.3);
-      padding: 5px;
-      border-radius: 10px;
-    }
-    .avatar {
-      width: 35px;
-      height: 35px;
-      box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3),
-        -2px 0px 4px rgba(0, 0, 0, 0.3);
-      border-radius: 10px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-  }
-}
-
 .second-tag {
   width: auto;
   height: auto;
@@ -419,9 +363,9 @@
   gap: 10px;
 }
 
-.first-tag{
+.first-tag {
   margin: 0px 20px;
-  .sub-title{
+  .sub-title {
     text-align: center;
     margin-top: -5px;
     font-size: 15px;
@@ -445,36 +389,56 @@
 }
 
 :deep(.el-tabs__item) {
- font-size: 25px; 
- height: 70px;
-}
-
-:deep(.el-tabs__nav-scroll){
+  font-size: 25px;
   height: 70px;
 }
 
-:deep(.el-row){
-  width: auto;  
+:deep(.el-tabs__nav-scroll) {
+  height: 70px;
 }
 
-:deep(.el-tabs__item){
-  color:gray;
+:deep(.el-row) {
+  width: auto;
 }
 
-:deep(.el-tabs__item.is-active){
-  color:#409eff;
+:deep(.el-tabs__item) {
+  color: gray;
 }
 
-:deep(.el-tabs__nav-wrap:after ){
+:deep(.el-tabs__item.is-active) {
+  color: #409eff;
+}
+
+:deep(.el-tabs__nav-wrap:after) {
   display: none;
 }
 
-:deep(.el-tabs__nav-prev){
+:deep(.el-tabs__nav-prev) {
   margin-top: 20px;
-} 
+}
 
-:deep(.el-tabs__nav-next){
+:deep(.el-tabs__nav-next) {
   margin-top: 20px;
+}
+
+.file-icon-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+}
+
+.file-icon {
+  font-size: 40px;
+  color: #606266;
+}
+
+.file-type {
+  margin-top: 10px;
+  color: #606266;
+  font-size: 14px;
 }
 
 @media screen and (max-width: 768px) {

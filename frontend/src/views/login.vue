@@ -32,7 +32,7 @@ const { proxy } = getCurrentInstance()
 
 const loginForm = reactive({
     username: 'admin',
-    password: '123456'
+    password: '123123'
 })
 
 const loginRules = reactive({
@@ -66,18 +66,18 @@ const handleLogin = () => {
         else if (result.code === 1) {
             loading.value = false
             ElMessage.success(result.msg)
-            // return
             setTimeout(() => {
                 proxy.$token.value = result.data.token;
                 proxy.$user.value = result.data.user;
                 // proxy.$router.push('/file')
-                if (result.data.status === "repassword") {
-                    proxy.$router.push('/repassword')
-                } else if (result.data.status === "success") {
-                    proxy.$router.push('/file')
-                    // const url = `http://192.168.30.23:7860?token=${proxy.$token.value}`;
-                    // window.location.href = url;
-                }
+                proxy.$router.push('/doc')
+                // if (result.data.status === "repassword") {
+                //     proxy.$router.push('/repassword')
+                // } else if (result.data.status === "success") {
+                //     proxy.$router.push('/file')
+                //     // const url = `http://192.168.30.23:7860?token=${proxy.$token.value}`;
+                //     // window.location.href = url;
+                // }
             }, 1000);
         }
     })

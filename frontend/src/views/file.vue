@@ -1656,6 +1656,12 @@ const ws = ref(null);
 const parseQueue = ref([]);
 const isParsing = ref(false);
 const localIP = ref('');
+const previewVisible = ref(false);
+const previewLoading = ref(false);
+
+const currentPage = ref(1);
+const totalPages = ref(0);
+let pdfDoc = null;
 onMounted(() => {
   getFileList();
   getTagList();
@@ -1740,7 +1746,6 @@ const mapDocumentData = (item) => ({
   uid: 0
 });
 
-// 获取文件列表
 const getFileList = async () => {
   const result = await proxy.$GET({
     url: 'file/getfilelist',
@@ -1762,7 +1767,6 @@ const getFileList = async () => {
   documents.value = result.data.data.map(mapDocumentData);
 };
 
-// 获取标签列表
 const getTagList = async () => {
   var result = await proxy.$POST({
     url: 'file/gettaglist'
@@ -1772,7 +1776,6 @@ const getTagList = async () => {
   });
 };
 
-// 获取自动补全搜索框
 const getQuerySearch = async () => {
   var result = await proxy.$POST({
     url: 'file/getquerysearch'
@@ -1941,11 +1944,8 @@ const connectWebsocket = async () => {
     }
 
     ws.value = new WebSocket('ws://192.168.6.185:8000/ws');
-
-    // 错误处理中增加重试计数
     ws.value.onerror = (error) => {
       console.error('WebSocket错误:', error);
-      // ElMessage.error('WebSocket连接失败，请检查网络');
     };
 
     ws.value.onopen = () => {
@@ -1959,10 +1959,8 @@ const connectWebsocket = async () => {
 
 const searchQuery = ref('');
 const tags = ref([]);
-
 const selectedTagsMap = reactive({});
 
-// 标签状态变化处理
 const handleTagChange = (tag) => {
   selectedTagsMap[tag] = !selectedTagsMap[tag];
   updateSelectedTags();
@@ -1970,10 +1968,8 @@ const handleTagChange = (tag) => {
   getFileList();
 };
 
-// 更新选中标签数组
+
 const updateSelectedTags = () => {
-  // object.keys()获取对象所有的key
-  // filter()过滤值为true的key
   selectedTags.value = Object.keys(selectedTagsMap).filter(
     (tag) => selectedTagsMap[tag]
   );
@@ -2001,7 +1997,6 @@ const beforeUpload = (file) => {
     return false;
   }
 
-  // 通用文档对象结构
   const newDocument = {
     title: file.name,
     type: 'pdf',
@@ -2018,10 +2013,9 @@ const beforeUpload = (file) => {
     isMemory: false,
     isEditing: false,
     progress: 0,
-    uid: file.uid // 确保使用文件原生UID
+    uid: file.uid 
   };
 
-  // 根据当前标签页选择对应数组
   const targetArray = {
     law: documents,
     policy: policy,
@@ -2043,7 +2037,6 @@ const beforeUpload = (file) => {
   return true;
 };
 
-// 上传进度条
 const handleProgress = (event, file) => {
   const findInArray = (arr) => arr.value.find((d) => d.uid === file.uid);
   const targetDoc =
@@ -2062,7 +2055,6 @@ const handleProgress = (event, file) => {
 const handleSuccess = async (response, uploadFile) => {
   loading.value = false;
 
-  // 根据分类更新总数
   const counterMap = {
     law: totalFiles,
     policy: totalPolicy,
@@ -2078,7 +2070,6 @@ const handleSuccess = async (response, uploadFile) => {
     counterMap.value++;
   }
 
-  // 查找并更新对应文档状态
   const targetArrayMap = {
     law: documents,
     policy: policy,
@@ -2092,7 +2083,6 @@ const handleSuccess = async (response, uploadFile) => {
   if (targetArrayMap) {
     const targetDoc = targetArrayMap.find((d) => d.uid === uploadFile.uid);
     if (targetDoc) {
-      // 关闭上传状态，开启解析状态
       targetDoc.docURL = response.data.url;
       //  targetDoc.docURL = `${localIP.value}:5173/uploads/pdf/${response.data.url}`;
       targetDoc.id = response.data.id;
@@ -2124,7 +2114,6 @@ const handleSuccess = async (response, uploadFile) => {
   });
 };
 
-// 统一的消息处理器
 const setupWebSocketHandler = () => {
   if (!ws.value) return;
 
@@ -2133,7 +2122,6 @@ const setupWebSocketHandler = () => {
     if (data.status === 'error') {
       ElMessage.error(data.message);
 
-      // 立即从解析队列中移除失败项
       parseQueue.value = parseQueue.value.filter((item) => item.id != data.id);
       try {
         const result = await proxy.$GET({
@@ -2142,16 +2130,12 @@ const setupWebSocketHandler = () => {
         });
 
         if (result.code === 1) {
-          // 从界面移除文档
           documents.value = documents.value.filter((d) => d.id != data.id);
-
-          // 强制继续解析
           isParsing.value = false;
           startNextParse();
         }
       } catch (error) {
         console.error('删除文件失败:', error);
-        // 即使删除失败也继续解析
         isParsing.value = false;
         startNextParse();
       }
@@ -2172,7 +2156,6 @@ const setupWebSocketHandler = () => {
   };
 };
 
-// 启动解析流程
 const startNextParse = () => {
   if (parseQueue.value.length === 0 || isParsing.value) return;
 
@@ -2190,14 +2173,12 @@ const startNextParse = () => {
       data: currentDoc.base64Data ? currentDoc.base64Data : ''
     });
   } else {
-    // 新增：当找不到文档时自动清理队列
     parseQueue.value.shift();
     isParsing.value = false;
     startNextParse();
   }
 };
 
-// 添加文件到解析队列
 const addToParseQueue = (fileData) => {
   parseQueue.value.push(fileData);
   if (!isParsing.value) {
@@ -2209,40 +2190,35 @@ const addToParseQueue = (fileData) => {
 const fileToBase64 = (file) => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    reader.onload = () => resolve(reader.result.split(',')[1]); // 去除data:前缀
+    reader.onload = () => resolve(reader.result.split(',')[1]); 
     reader.onerror = (error) => reject(error);
     reader.readAsDataURL(file);
   });
 };
 
-// WebSocket发送方法
 const sendViaWebSocket = (data) => {
   if (ws.value?.readyState === WebSocket.OPEN) {
     ws.value.send(JSON.stringify(data));
   } else {
     console.error('WebSocket连接未就绪');
-    // 可以在这里添加重连逻辑
   }
 };
 
-// 上传错误处理
 const handleError = (err) => {
   loading.value = false;
   ElMessage.error(`上传失败: ${err.message}`);
 };
 
-//点击未记忆
 const deepMemory = async (doc) => {
   if (doc.progress === 100) {
     ElMessage.success('已提取知识');
     return;
   }
 
-  isMemoryProcessing.value = true; // 开启蒙层
+  isMemoryProcessing.value = true; 
   simulateProgress(doc);
 };
 
-// 未记忆进度条
 const simulateProgress = async (doc) => {
   if (!doc.isProcessing) {
     doc.isProcessing = true;
@@ -2254,22 +2230,17 @@ const simulateProgress = async (doc) => {
   }
 };
 
-const showPdf = ref(false);
 const pdfUrl = ref('');
 
-// 预览pdf
 const previewPdf = async (doc) => {
   previewVisible.value = true;
   previewLoading.value = true;
   pdfUrl.value = doc.docURL;
 
   try {
-    // 初始化PDF文档
     const loadingTask = pdfjsLib.getDocument(pdfUrl.value);
     pdfDoc = await loadingTask.promise;
     totalPages.value = pdfDoc.numPages;
-
-    // 渲染第一页
     await renderPage(currentPage.value);
   } catch (error) {
     ElMessage.error('PDF加载失败: ' + error.message);
@@ -2279,7 +2250,6 @@ const previewPdf = async (doc) => {
   }
 };
 
-// 添加页面渲染方法
 const renderPage = async (num) => {
   if (!pdfDoc || num < 1 || num > totalPages.value) return;
 
@@ -2287,19 +2257,15 @@ const renderPage = async (num) => {
   const canvas = document.getElementById('pdf-canvas');
   const context = canvas.getContext('2d');
 
-  // 设置缩放比例
   const viewport = page.getViewport({ scale: 1.5 });
   canvas.height = viewport.height;
   canvas.width = viewport.width;
-
-  // 渲染页面
   await page.render({
     canvasContext: context,
     viewport: viewport
   }).promise;
 };
 
-// 添加弹窗关闭处理
 const closePreview = () => {
   previewVisible.value = false;
   if (pdfDoc) {
@@ -2311,16 +2277,14 @@ const closePreview = () => {
 const tagText = ref(null);
 
 const a = ref('');
-// 编辑标签
+
 const editTag = async (doc) => {
   doc.isEditing = true;
   a.value = doc.tags;
 };
 
-// 保存标签
 const saveTag = async (doc) => {
   if (doc.tags === '') {
-    // ElMessage.error("标签不能为空");
     doc.isEditing = false;
     return;
   }
@@ -2331,28 +2295,22 @@ const saveTag = async (doc) => {
   });
   if (result.code === 1) {
     if (!tags.value.includes(doc.tags)) {
-      // 数组去掉a.value
       tags.value = tags.value.filter((item) => item !== a.value);
       tags.value.push(doc.tags);
     }
 
     doc.isEditing = false;
   } else {
-    // ElMessage.error(result.msg);
     doc.isEditing = false;
   }
 };
 
-// 取消编辑
 const cancelEdit = (doc) => {
   doc.isEditing = false;
 };
 
-// 点击页数
 const pageChange = async (data) => {
   page.value = data;
-
-  //根据不调标签页调用方法
   const targetArrayMap = {
     law: getFileList,
     policy: getPolicyList,
@@ -2379,14 +2337,12 @@ const showHighlight = reactive({
   repository: false,
   script: false
 });
-// 搜索
+
 const searchDocuments = async () => {
   if (searchQuery.value === '') {
     return false;
   }
   page.value = 1;
-
-  // 获取所有分类数据
   await Promise.all([
     getFileList(),
     getPolicyList(),
@@ -2398,7 +2354,6 @@ const searchDocuments = async () => {
     getScriptList()
   ]);
 
-  // 单独设置每个分类的高亮状态
   showHighlight.law = totalFiles.value > 0;
   showHighlight.policy = totalPolicy.value > 0;
   showHighlight.official = totalOfficial.value > 0;
@@ -2414,7 +2369,6 @@ const querySearch = (queryString, cb) => {
   const results = queryString
     ? restaurants.value.filter(createFilter(queryString))
     : restaurants.value;
-  // call callback function to return suggestions
   cb(results);
 };
 const createFilter = (queryString) => {
@@ -2438,7 +2392,6 @@ const resetAll = async () => {
   getReportList();
   getRepositoryList();
   getScriptList();
-  // 循环遍历所有分类，将高亮状态重置为false
   Object.keys(showHighlight).forEach((key) => {
     showHighlight[key] = false;
   });
@@ -2448,7 +2401,6 @@ const handleSelect = (item) => {
   console.log(item);
 };
 
-// 新增文件名截断方法
 const truncateFileName = (name, maxLength) => {
   if (!name) return '';
   const extensionIndex = name.lastIndexOf('.');
@@ -2473,33 +2425,6 @@ const handleClick = (tab, event) => {
   activeName.value = tab.props.name;
 };
 
-// 新增canvas初始化方法
-const initCanvas = async (canvas, doc) => {
-  if (!canvas || !doc?.docURL) return;
-
-  const loadingTask = pdfjsLib.getDocument(doc.docURL);
-  try {
-    const pdf = await loadingTask.promise;
-    const page = await pdf.getPage(1);
-
-    const viewport = page.getViewport({ scale: 1.5 });
-    const context = canvas.getContext('2d');
-
-    canvas.height = viewport.height;
-    canvas.width = viewport.width;
-
-    const renderContext = {
-      canvasContext: context,
-      viewport: viewport
-    };
-
-    await page.render(renderContext).promise;
-  } catch (error) {
-    console.error('PDF渲染失败:', error);
-  }
-};
-
-// 添加清理逻辑
 onUnmounted(() => {
   if (ws.value) {
     ws.value.close();
@@ -2508,13 +2433,6 @@ onUnmounted(() => {
   parseQueue.value = [];
 });
 
-// 添加预览相关状态
-const previewVisible = ref(false);
-const previewLoading = ref(false);
-
-const currentPage = ref(1);
-const totalPages = ref(0);
-let pdfDoc = null;
 </script>
 
 <style scoped>

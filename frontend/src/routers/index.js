@@ -15,6 +15,11 @@ const routes = [
     path: '/repassword',
     name: 'repassword',
     component: () => import('@/views/repassword.vue')
+  },
+  {
+    path: '/doc',
+    name: 'doc',
+    component: () => import('@/views/doc.vue')
   }
 ];
 

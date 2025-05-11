@@ -162,11 +162,52 @@ let UPLOAD = (data = {}) => {
   });
 };
 
+// 分片上传专用方法
+let CHUNK_UPLOAD = (data = {}) => {
+  // 创建FormData对象
+  const formData = new FormData();
+
+  // 添加文件和其他参数
+  if (data.file) {
+    formData.append('file', data.file, data.fileName || data.file.name);
+  }
+
+  // 添加其他参数
+  if (data.params) {
+    for (const key in data.params) {
+      formData.append(key, data.params[key]);
+    }
+  }
+
+  return new Promise((resolve, reject) => {
+    axios({
+      method: 'post',
+      url: data.url,
+      data: formData,
+      headers: {
+        // 不要手动设置Content-Type，让浏览器自动处理
+      },
+      onUploadProgress: data.onProgress, // 进度回调
+      timeout: data.timeout || 120000, // 默认2分钟超时
+      cancelToken: new CancelToken((c) => {
+        cancel = c;
+      })
+    })
+      .then((res) => {
+        resolve(res);
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
+
 export default {
   install(app, options) {
     //定义全局访问
     app.config.globalProperties.$GET = GET;
     app.config.globalProperties.$POST = POST;
     app.config.globalProperties.$UPLOAD = UPLOAD;
+    app.config.globalProperties.$CHUNK_UPLOAD = CHUNK_UPLOAD;
   }
 };
