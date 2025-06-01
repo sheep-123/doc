@@ -34,5 +34,17 @@ export default defineConfig({
     },
     host: true,
     open: true
+  },
+  build: {
+    chunkSizeWarningLimit: 1000,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vueVendor: ['vue', 'vue-router'],
+          elementPlus: ['element-plus'],
+          utils: ['lodash-es', 'axios'],
+        }
+      }
+    }
   }
 });

@@ -14,11 +14,15 @@ import { createPinia } from 'pinia';
 import piniaPluginPersist from 'pinia-plugin-persist';
 import store from './store/index';
 
+import util from '@/utils/index';
+
 const app = createApp(App);
+app.config.globalProperties.$util = util;
 
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
   app.component(key, component);
 }
+
 app
   .use(createPinia().use(piniaPluginPersist))
   .use(store)

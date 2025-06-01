@@ -16,6 +16,7 @@
             :key="tag"
             :checked="selectedTagsMap[tag]"
             class="multi-tag"
+            S
             :type="selectedTagsMap[tag] ? 'success' : 'info'"
             @change="handleTagChange(tag)"
           >

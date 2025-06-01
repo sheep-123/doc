@@ -27,6 +27,7 @@
           icon="Search"
           @click="searchDocuments"
           style="margin-left: 10px"
+          :loading="loading"
           >搜索</el-button
         >
         <el-button
@@ -35,6 +36,7 @@
           @click="resetAll"
           plain
           style="color: black"
+          :loading="loading1"
           >重置</el-button
         >
       </div>
@@ -55,7 +57,7 @@
 
 <script setup>
 import { ref, getCurrentInstance, onMounted } from 'vue';
-import axios from 'axios';
+import { ElMessage } from 'element-plus';
 
 const { proxy } = getCurrentInstance();
 const searchQuery = ref('');
@@ -66,19 +68,21 @@ onMounted(() => {
 
 const restaurants = ref([]);
 const getQuerySearch = async () => {
-  try {
-    const response = await axios.post('file/getquerysearch');
-    const result = response.data;
-    if (result && result.code == 1) {
-      result.data.forEach((item) => {
-        // 设置key为value
-        restaurants.value.push({
-          value: item
-        });
+  const result = await proxy.$POST({
+    url: '/file/getquerysearch'
+  });
+
+  if (result.code == 0) {
+    ElMessage(result.msg);
+    return;
+  }
+
+  if (result.code == 1) {
+    result.data.forEach((item) => {
+      restaurants.value.push({
+        value: item
       });
-    }
-  } catch (error) {
-    console.error('获取搜索数据失败:', error);
+    });
   }
 };
 
@@ -102,20 +106,30 @@ const createFilter = (queryString) => {
     );
   };
 };
+const loading = ref(false);
+const searchDocuments = proxy.$util.throttle(() => {
+  if (loading == true) return;
+  loading.value = true;
+  setTimeout(() => {
+    loading.value = false;
+    proxy.$emit('search', searchQuery.value);
+  }, 500);
+}, 1000);
 
-const searchDocuments = () => {
-  // 触发父组件的搜索事件
-  proxy.$emit('search', searchQuery.value);
-};
-
-const resetAll = () => {
+const loading1 = ref(false);
+const resetAll = proxy.$util.throttle(() => {
+  if (loading1 == true) return;
+  loading1.value = true;
   searchQuery.value = '';
-  // 触发父组件的重置事件
-  proxy.$emit('reset');
-};
+  setTimeout(() => {
+    loading1.value = false;
+    proxy.$emit('reset');
+  }, 500);
+}, 1000);
 
 const handleSelect = (item) => {
   searchQuery.value = item.value;
+  searchDocuments();
 };
 </script>
 
@@ -126,12 +140,11 @@ const handleSelect = (item) => {
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 10000;
+  // z-index: 10000;
   height: 65px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  /* margin-bottom: 20px; */
   background-color: white;
   border-bottom: 1px solid #e5e7eb;
   .nav-left {
